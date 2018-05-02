@@ -9,7 +9,7 @@ import android.view.View;
 
 /**
  * @author 11718
- *         on 2017  November 19 Sunday 20:44.
+ * on 2017  November 19 Sunday 20:44.
  */
 
 public abstract class JtBaseActivity extends AppCompatActivity implements View.OnClickListener
@@ -20,7 +20,19 @@ public abstract class JtBaseActivity extends AppCompatActivity implements View.O
 	protected void onCreate(@Nullable Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
 		activityHandler = new ActivityHandler();
+	}
+	
+	
+	protected void initViews()
+	{
+		initResources();
+	}
+	
+	protected void initResources()
+	{
+	
 	}
 	
 	@Override
