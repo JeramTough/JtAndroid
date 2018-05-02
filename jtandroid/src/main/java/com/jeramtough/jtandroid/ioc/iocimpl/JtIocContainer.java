@@ -2,6 +2,7 @@ package com.jeramtough.jtandroid.ioc.iocimpl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import com.jeramtough.jtandroid.ioc.IocUtil;
 import com.jeramtough.jtandroid.ioc.annotation.*;
 import com.jeramtough.jtandroid.ioc.bean.JtField;
@@ -25,8 +26,6 @@ import java.util.Map;
 public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 		ServiceInterpreter.NeededComponentCaller
 {
-	public static final String JTLOG2_TAG_NAME = "JtIocContainer";
-	
 	private static volatile JtIocContainer jtIocContainer;
 	
 	private Map<String, Object> injectedComponents;
@@ -128,8 +127,9 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 	@Override
 	public void updateServiceValueOfContainer(Object newServerValue)
 	{
-		JtService jtService = newServerValue.getClass().getAnnotation(JtService.class);
-		if (jtService != null)
+		JtServiceImpl jtServiceImpl =
+				newServerValue.getClass().getAnnotation(JtServiceImpl.class);
+		if (jtServiceImpl != null)
 		{
 			String fieldKeyName = IocUtil.processKeyName(newServerValue.getClass());
 			injectedServices.put(fieldKeyName, newServerValue);
@@ -241,13 +241,14 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 					
 					if (filedValueObject != null)
 					{
-						JtService jtServiceAnnotation =
-								filedValueObject.getClass().getAnnotation(JtService.class);
-						if (jtServiceAnnotation.pattern() == JtObjectPattern.Singleton)
+						JtServiceImpl jtServiceImplAnnotation =
+								filedValueObject.getClass().getAnnotation(JtServiceImpl.class);
+						if (jtServiceImplAnnotation.pattern() == JtObjectPattern.Singleton)
 						{
 							injectedServices.put(fieldKeyName, filedValueObject);
 						}
-						else if (jtServiceAnnotation.pattern() == JtObjectPattern.Prototype)
+						else if (jtServiceImplAnnotation.pattern() ==
+								JtObjectPattern.Prototype)
 						{
 							newInjectedObjectsCount--;
 						}
@@ -275,6 +276,8 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 				+(jtFields.length - newInjectedViewsCount) + " the CSField and " +
 				newInjectedViewsCount + " ViewField .Now " + newInjectedObjectsCount +
 				" new Field objects inject to the IocContainer.";
+		
+		Log.i(this.getClass().getSimpleName(), text);
 	}
 	
 }

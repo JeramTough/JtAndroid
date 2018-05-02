@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 public class ComponentInterpreter implements Interpreter
 {
-	
 	private Context context;
 	
 	public ComponentInterpreter(Context context)

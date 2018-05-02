@@ -11,7 +11,7 @@ import android.content.Context;
 public interface IocContainer
 {
 	/**
-	 * inject the component and service of field values into this object
+	 * inject the component and implement of field values into this object
 	 *
 	 * @param context instance of the Context class
 	 * @param object  who be injected
@@ -27,7 +27,7 @@ public interface IocContainer
 	void injectView(Context context, Object object);
 	
 	/**
-	 * inject the component and  service and view of  field values into this object
+	 * inject the component and  implement and view of  field values into this object
 	 *
 	 * @param context instance of the Context class
 	 * @param object  who be injected

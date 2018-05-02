@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface JtService
+public @interface JtServiceImpl
 {
 	JtObjectPattern pattern() default JtObjectPattern.Singleton;
 }
