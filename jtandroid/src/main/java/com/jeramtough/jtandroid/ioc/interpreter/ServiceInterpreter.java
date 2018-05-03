@@ -5,6 +5,7 @@ import com.jeramtough.jtandroid.ioc.IocUtil;
 import com.jeramtough.jtandroid.ioc.annotation.InjectService;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
+import com.jeramtough.jtandroid.ioc.caller.NeededComponentCaller;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -21,13 +22,11 @@ import java.util.Map;
 public class ServiceInterpreter implements Interpreter
 {
 	private Context context;
-	private Map<String, Object> injectedComponents;
 	private NeededComponentCaller neededComponentCaller;
 	
-	public ServiceInterpreter(Context context, Map<String, Object> injectedComponents)
+	public ServiceInterpreter(Context context)
 	{
 		this.context = context;
-		this.injectedComponents = injectedComponents;
 	}
 	
 	@Override
@@ -71,17 +70,13 @@ public class ServiceInterpreter implements Interpreter
 							ArrayList<Object> constructorParameters = new ArrayList<>();
 							for (Class<?> c : constructor.getParameterTypes())
 							{
-								String fieldKeyName = IocUtil.processKeyName(c);
 								Object constructorParameter = null;
-								if (fieldKeyName.equals("context"))
+								String fieldKeyName = IocUtil.processKeyName(c);
+								if (c.equals(Context.class))
 								{
 									constructorParameter = context;
 								}
-								else
-								{
-									constructorParameter =
-											injectedComponents.get(fieldKeyName);
-								}
+								
 								if (constructorParameter == null &&
 										neededComponentCaller != null)
 								{
@@ -128,9 +123,4 @@ public class ServiceInterpreter implements Interpreter
 		this.neededComponentCaller = neededComponentCaller;
 	}
 	
-	//{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}
-	public interface NeededComponentCaller
-	{
-		Object needComponent(Context context, Class c);
-	}
 }

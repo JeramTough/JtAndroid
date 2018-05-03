@@ -1,8 +1,10 @@
 package com.jeramtough.jtandroid.ioc.interpreter;
 
 import android.content.Context;
+import com.jeramtough.jtandroid.ioc.IocUtil;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
+import com.jeramtough.jtandroid.ioc.caller.NeededComponentCaller;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -12,12 +14,13 @@ import java.util.ArrayList;
 
 /**
  * @author 11718
- *         on 2017  December 06 Wednesday 22:03.
+ * on 2017  December 06 Wednesday 22:03.
  */
 
 public class ComponentInterpreter implements Interpreter
 {
 	private Context context;
+	private NeededComponentCaller neededComponentCaller;
 	
 	public ComponentInterpreter(Context context)
 	{
@@ -33,7 +36,7 @@ public class ComponentInterpreter implements Interpreter
 	public Object instanceFieldObject(Class c)
 	{
 		Object fieldObject = null;
-		for (Annotation annotation : c.getAnnotations())
+		for (Annotation annotation : c.getDeclaredAnnotations())
 		{
 			if (annotation instanceof JtComponent)
 			{
@@ -51,16 +54,43 @@ public class ComponentInterpreter implements Interpreter
 							if (constructor.getAnnotation(IocAutowire.class) != null ||
 									constructor.getParameterTypes().length == 0)
 							{
-								ArrayList<Object> contructorParameter = new ArrayList<>();
+								ArrayList<Object> constructorParameters = new ArrayList<>();
 								for (Class<?> c1 : constructor.getParameterTypes())
 								{
+									Object constructorParameter = null;
+									String fieldKeyName;
+									fieldKeyName = IocUtil.processKeyName(c1);
+									
 									if (c1.isAssignableFrom(context.getClass()))
 									{
-										contructorParameter.add(context);
+										constructorParameter = context;
 									}
+									else
+									{
+										if (constructorParameter == null &&
+												neededComponentCaller != null)
+										{
+											constructorParameter = neededComponentCaller
+													.needComponent(context, c1);
+										}
+									}
+									
+									if (constructorParameter == null)
+									{
+										throw new IllegalStateException(
+												"fail to interpreted the " + "[" +
+														c1.getSimpleName() +
+														"] instance because the parameter[" +
+														fieldKeyName + "] " +
+														" of constructor");
+									}
+									constructorParameters.add(constructorParameter);
 								}
-								fieldObject = constructor.newInstance(contructorParameter
-										.toArray(new Object[contructorParameter.size()]));
+								
+								constructor.setAccessible(true);
+								
+								fieldObject = constructor.newInstance(constructorParameters
+										.toArray(new Object[constructorParameters.size()]));
 								break;
 							}
 						}
@@ -75,5 +105,8 @@ public class ComponentInterpreter implements Interpreter
 		return fieldObject;
 	}
 	
-	
+	public void setNeededComponentCaller(NeededComponentCaller neededComponentCaller)
+	{
+		this.neededComponentCaller = neededComponentCaller;
+	}
 }

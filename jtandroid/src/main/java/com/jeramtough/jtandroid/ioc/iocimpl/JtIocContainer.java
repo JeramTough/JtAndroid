@@ -6,6 +6,7 @@ import android.util.Log;
 import com.jeramtough.jtandroid.ioc.IocUtil;
 import com.jeramtough.jtandroid.ioc.annotation.*;
 import com.jeramtough.jtandroid.ioc.bean.JtField;
+import com.jeramtough.jtandroid.ioc.caller.NeededComponentCaller;
 import com.jeramtough.jtandroid.ioc.exception.InjectFailedException;
 import com.jeramtough.jtandroid.ioc.filter.FieldsFilter;
 import com.jeramtough.jtandroid.ioc.filter.FieldsFilterFactory;
@@ -23,8 +24,8 @@ import java.util.Map;
  * @author 11718 on 2017 December 05 Tuesday 22:42.
  */
 
-public class JtIocContainer implements IocContainer, ContainerUpdateValues,
-		ServiceInterpreter.NeededComponentCaller
+public class JtIocContainer
+		implements IocContainer, ContainerUpdateValues, NeededComponentCaller
 {
 	private static volatile JtIocContainer jtIocContainer;
 	
@@ -172,9 +173,16 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 	@Override
 	public Object needComponent(Context context, Class c)
 	{
-		ComponentInterpreter componentInterpreter = new ComponentInterpreter(context);
-		Object fieldObject = componentInterpreter.instanceFieldObject(c);
-		injectedComponents.put(IocUtil.processKeyName(c), fieldObject);
+		String fieldKeyName = IocUtil.processKeyName(c);
+		Object fieldObject = injectedComponents.get(fieldKeyName);
+		
+		if (fieldObject == null)
+		{
+			ComponentInterpreter componentInterpreter = new ComponentInterpreter(context);
+			componentInterpreter.setNeededComponentCaller(this);
+			fieldObject = componentInterpreter.instanceFieldObject(c);
+			injectedComponents.put(fieldKeyName, fieldObject);
+		}
 		return fieldObject;
 	}
 	
@@ -195,6 +203,7 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 				{
 					ComponentInterpreter componentInterpreter =
 							new ComponentInterpreter(context);
+					componentInterpreter.setNeededComponentCaller(this);
 					filedValueObject =
 							componentInterpreter.getFieldValueObject(jtField.getField());
 					if (filedValueObject != null)
@@ -233,8 +242,7 @@ public class JtIocContainer implements IocContainer, ContainerUpdateValues,
 				filedValueObject = injectedServices.get(fieldKeyName);
 				if (filedValueObject == null)
 				{
-					ServiceInterpreter serviceInterpreter =
-							new ServiceInterpreter(context, injectedComponents);
+					ServiceInterpreter serviceInterpreter = new ServiceInterpreter(context);
 					serviceInterpreter.setNeededComponentCaller(this);
 					filedValueObject =
 							serviceInterpreter.getFieldValueObject(jtField.getField());
