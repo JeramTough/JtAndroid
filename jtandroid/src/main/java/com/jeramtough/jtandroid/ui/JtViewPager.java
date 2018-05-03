@@ -66,13 +66,14 @@ public class JtViewPager extends ViewPager
 	}
 	
 	@Override
-	public boolean onTouchEvent(MotionEvent ev)
-	{
-		/*if (!scrollble)
-		{
-			return true;
-		}*/
-		return super.onTouchEvent(ev);
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		return scrollble && super.onInterceptTouchEvent(ev);
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return scrollble && super.onTouchEvent(ev);
+		
 	}
 	
 	public void setCanJumpPage(boolean canJumpPage)

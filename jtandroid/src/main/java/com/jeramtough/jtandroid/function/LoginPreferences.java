@@ -8,7 +8,6 @@ import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
 @JtComponent
 public class LoginPreferences
 {
-	
 	private Context context;
 	private SharedPreferences sharedPreferences;
 	private SharedPreferences.Editor editor;

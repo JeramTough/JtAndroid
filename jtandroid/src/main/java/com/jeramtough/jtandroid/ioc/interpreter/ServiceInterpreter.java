@@ -58,7 +58,7 @@ public class ServiceInterpreter implements Interpreter
 			
 			if (annotation instanceof JtServiceImpl)
 			{
-				isHadEspecialAnnotation =true;
+				isHadEspecialAnnotation = true;
 				
 				try
 				{
@@ -72,8 +72,16 @@ public class ServiceInterpreter implements Interpreter
 							for (Class<?> c : constructor.getParameterTypes())
 							{
 								String fieldKeyName = IocUtil.processKeyName(c);
-								Object constructorParameter =
-										injectedComponents.get(fieldKeyName);
+								Object constructorParameter = null;
+								if (fieldKeyName.equals("context"))
+								{
+									constructorParameter = context;
+								}
+								else
+								{
+									constructorParameter =
+											injectedComponents.get(fieldKeyName);
+								}
 								if (constructorParameter == null &&
 										neededComponentCaller != null)
 								{
