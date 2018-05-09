@@ -1,6 +1,8 @@
 package com.jeramtough.jtandroid.controller.handler;
 
 import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
+
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
 import com.jeramtough.jtandroid.ioc.iocimpl.IocContainer;
 import com.jeramtough.jtandroid.ioc.iocimpl.JtIocContainer;
@@ -12,7 +14,7 @@ import com.jeramtough.jtandroid.ioc.iocimpl.JtIocContainer;
 @JtController
 public class JtIocHandler extends JtBaseHandler
 {
-	public JtIocHandler(Activity activity)
+	public JtIocHandler(AppCompatActivity activity)
 	{
 		super(activity);
 		getIocContainer().injectCSV(activity, this);

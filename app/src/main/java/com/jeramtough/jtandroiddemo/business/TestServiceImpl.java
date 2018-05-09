@@ -3,7 +3,7 @@ package com.jeramtough.jtandroiddemo.business;
 import android.content.Context;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
-import com.jeramtough.jtandroiddemo.component.A;
+import com.jeramtough.jtandroiddemo.component.dao.mapper.ShallLearningMapper;
 
 /**
  * @author 11718
@@ -14,13 +14,13 @@ class TestServiceImpl implements TestService
 {
 	
 	private Context context;
-	private A a;
+	private ShallLearningMapper shallLearningMapper;
 	
 	@IocAutowire
-	TestServiceImpl(Context context, A a)
+	TestServiceImpl(Context context, ShallLearningMapper shallLearningMapper)
 	{
 		this.context = context;
-		this.a = a;
+		this.shallLearningMapper = shallLearningMapper;
 	}
 	
 	@Override

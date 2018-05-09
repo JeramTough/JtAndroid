@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,7 +31,12 @@ public abstract class JtBaseFragment extends Fragment implements View.OnClickLis
 		view = inflater.inflate(loadFragmentLayoutId(), null);
 		return view;
 	}
-	
+
+	protected void initResources()
+	{
+
+	}
+
 	public abstract int loadFragmentLayoutId();
 	
 	public final <T extends View> T findViewById(@IdRes int viewId) {

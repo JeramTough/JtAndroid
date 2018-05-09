@@ -15,8 +15,8 @@ import com.jeramtough.jtandroiddemo.component.A;
  */
 public class MainActivity extends JtIocActivity
 {
-//	@InjectService
-//	private TestService testService;
+	@InjectService
+	private TestService testService;
 	
 	@InjectComponent
 	private A a;
