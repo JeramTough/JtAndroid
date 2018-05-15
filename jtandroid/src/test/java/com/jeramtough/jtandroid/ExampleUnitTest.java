@@ -1,5 +1,7 @@
 package com.jeramtough.jtandroid;
 
+import com.jeramtough.jtandroid.function.CountBetweenTime;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,6 +16,14 @@ public class ExampleUnitTest
 	@Test
 	public void addition_isCorrect()
 	{
-		assertEquals(4, 2 + 2);
+		CountBetweenTime countBetweenTime=new CountBetweenTime();
+		countBetweenTime.takeTime();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		countBetweenTime.takeTime();
+		System.out.println(countBetweenTime.getIntervalTime());
 	}
 }
