@@ -6,7 +6,7 @@ import android.widget.AbsListView;
 /**
  * @author 11718
  */
-public abstract class OnScreenBottomOrTopListener implements AbsListView.OnScrollListener
+public abstract class OnScrollBottomOrTopListener implements AbsListView.OnScrollListener
 {
 	
 	private boolean isStart = false;
@@ -24,7 +24,7 @@ public abstract class OnScreenBottomOrTopListener implements AbsListView.OnScrol
 				
 				if (isStart)
 				{
-					onScreenTop();
+					onScrollTop();
 				}
 				
 			}
@@ -35,7 +35,7 @@ public abstract class OnScreenBottomOrTopListener implements AbsListView.OnScrol
 			if (lastVisibleItemView != null &&
 					lastVisibleItemView.getBottom() == view.getHeight())
 			{
-				onScreenBottom();
+				onScrollBottom();
 			}
 		}
 	}
@@ -57,11 +57,11 @@ public abstract class OnScreenBottomOrTopListener implements AbsListView.OnScrol
 		}
 	}
 	
-	public void onScreenBottom()
+	public void onScrollBottom()
 	{
 	}
 	
-	public void onScreenTop()
+	public void onScrollTop()
 	{
 	}
 	
