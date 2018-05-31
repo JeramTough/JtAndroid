@@ -1247,7 +1247,10 @@ public class HorizontalListView extends AdapterView<ListAdapter>
      * @param scrolledOffset The scroll offset
      */
     private void updateOverscrollAnimation(final int scrolledOffset) {
-        if (mEdgeGlowLeft == null || mEdgeGlowRight == null) return;
+        if (mEdgeGlowLeft == null || mEdgeGlowRight == null)
+        {
+            return;
+        }
 
         // Calculate where the next scroll position would be
         int nextScrollPosition = mCurrentX + scrolledOffset;
@@ -1289,7 +1292,10 @@ public class HorizontalListView extends AdapterView<ListAdapter>
      * The glow is not enabled unless there are more views than can fit on the screen at one time.
      */
     private boolean isEdgeGlowEnabled() {
-        if (mAdapter == null || mAdapter.isEmpty()) return false;
+        if (mAdapter == null || mAdapter.isEmpty())
+        {
+            return false;
+        }
 
         // If the maxx is more then zero then the user can scroll, so the edge effects should be shown
         return mMaxX > 0;
