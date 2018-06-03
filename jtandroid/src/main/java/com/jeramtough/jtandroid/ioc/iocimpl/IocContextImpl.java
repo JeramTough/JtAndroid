@@ -41,9 +41,9 @@ public class IocContextImpl implements IocContext {
         final ArrayList<JtField> jtFields = new ArrayList<>();
         final JtFieldFinder jtFieldFinder = new JtFieldFinderImpl();
         List<Future<List<JtField>>> futures = new ArrayList<>();
+
         //traverse all the JtController to find the JtFields.
         Class c = beInjectedObject.getClass();
-
         while (c.getSuperclass() != null) {
             final Class finalC = c;
             Future<List<JtField>> future = executorService.submit(new Callable<List<JtField>>() {
@@ -60,19 +60,14 @@ public class IocContextImpl implements IocContext {
         }
 
         for (Future<List<JtField>> future : futures) {
-            if (future.isDone()) {
-                try {
-                    if (future.get() != null) {
-                        jtFields.addAll(future.get());
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+            try {
+                if (future.get() != null) {
+                    jtFields.addAll(future.get());
                 }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         }
-
-        P.info(jtFields.size());
-
 
         for (JtField jtField : jtFields) {
             Object beanInstance = beansContainer.getBean(jtField);
