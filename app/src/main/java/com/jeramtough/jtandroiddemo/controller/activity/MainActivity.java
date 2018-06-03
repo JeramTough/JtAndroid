@@ -40,7 +40,8 @@ public class MainActivity extends JtIocActivity {
 
     @InjectService
     private TestService testService;
-
+    @InjectComponent
+    private MusicPlayer musicPlayer;
     @InjectComponent
     private A a;
     @InjectComponent
@@ -51,9 +52,6 @@ public class MainActivity extends JtIocActivity {
     private D d;
     @InjectComponent
     private E e;
-
-    @InjectComponent
-    private MusicPlayer musicPlayer;
 
 
     @Override

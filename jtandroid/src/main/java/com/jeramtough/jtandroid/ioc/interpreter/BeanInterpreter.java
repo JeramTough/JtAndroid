@@ -70,8 +70,6 @@ public class BeanInterpreter implements Interpreter {
             beanInstancesFutures.add(future);
         }
 
-        P.info(beanInstancesFutures.size());
-
         for (Future<Object> future : beanInstancesFutures) {
             try {
                 constructorParameters.add(future.get());

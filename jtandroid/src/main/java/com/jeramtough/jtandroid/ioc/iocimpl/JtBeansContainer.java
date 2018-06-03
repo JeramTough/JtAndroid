@@ -23,27 +23,29 @@ class JtBeansContainer implements BeansContainer, BeanInterpreter.NeededParamCal
 
 
     @Override
-    public <T> T getBean(Class<T> requiredBeanClass) {
+    public synchronized <T> T getBean(Class<T> beanClass) {
+        return (T) getObjectAsync(beanClass);
+    }
+
+    public Object getObjectAsync(Class beanClass) {
         Object beanInstance;
-        BeanInterpreter beanInterpreter = new BeanInterpreter(applicationContext, requiredBeanClass);
+        BeanInterpreter beanInterpreter = new BeanInterpreter(applicationContext, beanClass);
         beanInterpreter.setNeededParamCaller(this);
 
-        synchronized (JtBeansContainer.class) {
-            if (!isContainedBean(requiredBeanClass)) {
-                beanInstance = beanInterpreter.getBeanInstance();
-            } else {
-                beanInstance = beans.get(IocUtil.processKeyName(requiredBeanClass));
-            }
+        if (!isContainedBean(beanClass)) {
+            beanInstance = beanInterpreter.getBeanInstance();
+        } else {
+            beanInstance = beans.get(IocUtil.processKeyName(beanClass));
         }
 
         switch (beanInterpreter.getBeanAnnotationInfo().getJtBeanPattern()) {
             case Singleton:
-                String beanKey = IocUtil.processKeyName(requiredBeanClass);
+                String beanKey = IocUtil.processKeyName(beanClass);
                 beans.put(beanKey, beanInstance);
                 break;
         }
 
-        return (T) beanInstance;
+        return beanInstance;
     }
 
     @Override
@@ -90,7 +92,7 @@ class JtBeansContainer implements BeansContainer, BeanInterpreter.NeededParamCal
 
     @Override
     public Object getParamOfConstructor(Class c) {
-        return getBean(c);
+        return getObjectAsync(c);
     }
 
 }
