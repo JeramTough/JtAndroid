@@ -22,6 +22,8 @@ public class JtViewPager extends ViewPager
     
     private JumpToLastCaller jumpToLastCaller;
     
+    private InitFinishedCaller initFinishedCaller;
+    
     public JtViewPager(Context context)
     {
         super(context);
@@ -80,7 +82,6 @@ public class JtViewPager extends ViewPager
         return scrollble && super.onTouchEvent(ev);
     }
     
-    
     public void setCanJumpPage(boolean canJumpPage)
     {
         this.canJumpPage = canJumpPage;
@@ -127,6 +128,45 @@ public class JtViewPager extends ViewPager
         }
     }
     
+    public void setLastPage(boolean lastPage)
+    {
+        isLastPage = lastPage;
+    }
+    
+    /**
+     * you must invoke the setAdapter() method before invoking this method.
+     */
+    public void setInitFinishedCaller(final InitFinishedCaller initFinishedCaller)
+    {
+        this.initFinishedCaller = initFinishedCaller;
+        if (initFinishedCaller != null)
+        {
+            new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    for (; ; )
+                    {
+                        View view = JtViewPager.this.getChildAt(0);
+                        if (view != null)
+                        {
+                            post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    initFinishedCaller.initFinished();
+                                }
+                            });
+                            break;
+                        }
+                    }
+                }
+            }.start();
+        }
+    }
+    
     //************************************
     private void jumpToLast()
     {
@@ -141,6 +181,11 @@ public class JtViewPager extends ViewPager
     public interface JumpToLastCaller
     {
         void jumpToLast();
+    }
+    
+    public interface InitFinishedCaller
+    {
+        void initFinished();
     }
     
 }

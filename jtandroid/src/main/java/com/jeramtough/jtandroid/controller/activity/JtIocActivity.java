@@ -3,7 +3,7 @@ package com.jeramtough.jtandroid.controller.activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
-import com.jeramtough.jtandroid.ioc.iocimpl.IocContainer;
+import com.jeramtough.jtandroid.ioc.IocContainer;
 import com.jeramtough.jtandroid.ioc.iocimpl.JtIocContainer;
 
 /**

@@ -3,6 +3,7 @@ package com.jeramtough.jtandroid.ioc.iocimpl;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import com.jeramtough.jtandroid.ioc.IocContainer;
 import com.jeramtough.jtandroid.ioc.IocUtil;
 import com.jeramtough.jtandroid.ioc.annotation.*;
 import com.jeramtough.jtandroid.ioc.bean.JtField;

@@ -1,4 +1,4 @@
-package com.jeramtough.jtandroid.ioc.iocimpl;
+package com.jeramtough.jtandroid.ioc;
 
 
 import android.content.Context;
