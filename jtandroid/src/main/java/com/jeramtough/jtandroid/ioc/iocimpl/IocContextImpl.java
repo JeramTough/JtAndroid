@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -35,12 +34,13 @@ public class IocContextImpl implements IocContext {
     }
 
     @Override
-    public void injectBeansInto(Object beInjectedObject) {
+    public void injectBeansInto(final Object beInjectedObject) {
         long startInjectingTime = System.currentTimeMillis();
 
         final ArrayList<JtField> jtFields = new ArrayList<>();
         final JtFieldFinder jtFieldFinder = new JtFieldFinderImpl();
-        List<Future<List<JtField>>> futures = new ArrayList<>();
+        List<Future<List<JtField>>> jtFieldsFutures = new ArrayList<>();
+        List<Future<Object>> beanInstancesFutures = new ArrayList<>();
 
         //traverse all the JtController to find the JtFields.
         Class c = beInjectedObject.getClass();
@@ -55,11 +55,11 @@ public class IocContextImpl implements IocContext {
                     return null;
                 }
             });
-            futures.add(future);
+            jtFieldsFutures.add(future);
             c = c.getSuperclass();
         }
 
-        for (Future<List<JtField>> future : futures) {
+        for (Future<List<JtField>> future : jtFieldsFutures) {
             try {
                 if (future.get() != null) {
                     jtFields.addAll(future.get());
@@ -69,15 +69,32 @@ public class IocContextImpl implements IocContext {
             }
         }
 
-        for (JtField jtField : jtFields) {
-            Object beanInstance = beansContainer.getBean(jtField);
-            jtField.getField().setAccessible(true);
+        for (final JtField jtField : jtFields) {
+            Future<Object> future = executorService.submit(new Callable<Object>() {
+                @Override
+                public Object call() {
+                    Object beanInstance = beansContainer.getBean(jtField);
+                    jtField.getField().setAccessible(true);
+                    try {
+                        jtField.getField().set(beInjectedObject, beanInstance);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return beanInstance;
+                }
+            });
+            beanInstancesFutures.add(future);
+        }
+
+        for (Future<Object> future : beanInstancesFutures) {
             try {
-                jtField.getField().set(beInjectedObject, beanInstance);
-            } catch (IllegalAccessException e) {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
+
+        executorService.shutdown();
 
         long endInjectingTime = System.currentTimeMillis();
         P.info("Speed " + (endInjectingTime - startInjectingTime)

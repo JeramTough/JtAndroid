@@ -26,6 +26,10 @@ import com.jeramtough.jtandroid.listener.OnScrollBottomOrTopListener;
 import com.jeramtough.jtandroiddemo.R;
 import com.jeramtough.jtandroiddemo.business.TestService;
 import com.jeramtough.jtandroiddemo.component.A;
+import com.jeramtough.jtandroiddemo.component.B;
+import com.jeramtough.jtandroiddemo.component.C;
+import com.jeramtough.jtandroiddemo.component.D;
+import com.jeramtough.jtandroiddemo.component.E;
 
 import java.io.IOException;
 
@@ -39,6 +43,14 @@ public class MainActivity extends JtIocActivity {
 
     @InjectComponent
     private A a;
+    @InjectComponent
+    private B b;
+    @InjectComponent
+    private C c;
+    @InjectComponent
+    private D d;
+    @InjectComponent
+    private E e;
 
     @InjectComponent
     private MusicPlayer musicPlayer;

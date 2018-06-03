@@ -23,17 +23,19 @@ class JtBeansContainer implements BeansContainer, BeanInterpreter.NeededParamCal
 
 
     @Override
-    public synchronized <T> T getBean(Class<T> requiredBeanClass) {
+    public <T> T getBean(Class<T> requiredBeanClass) {
         Object beanInstance;
         BeanInterpreter beanInterpreter = new BeanInterpreter(applicationContext, requiredBeanClass);
         beanInterpreter.setNeededParamCaller(this);
 
-        if (!isContainedBean(requiredBeanClass)) {
-            beanInstance = beanInterpreter.getBeanInstance();
-        } else {
-            beanInstance = beans.get(IocUtil.processKeyName(requiredBeanClass));
+        synchronized (JtBeansContainer.class) {
+            if (!isContainedBean(requiredBeanClass)) {
+                beanInstance = beanInterpreter.getBeanInstance();
+            } else {
+                beanInstance = beans.get(IocUtil.processKeyName(requiredBeanClass));
+            }
         }
-        
+
         switch (beanInterpreter.getBeanAnnotationInfo().getJtBeanPattern()) {
             case Singleton:
                 String beanKey = IocUtil.processKeyName(requiredBeanClass);
@@ -45,7 +47,7 @@ class JtBeansContainer implements BeansContainer, BeanInterpreter.NeededParamCal
     }
 
     @Override
-    public synchronized Object getBean(JtField jtField) {
+    public Object getBean(JtField jtField) {
         Class c = null;
         if (!jtField.getImplClass().equals(Object.class)) {
             c = jtField.getImplClass();
