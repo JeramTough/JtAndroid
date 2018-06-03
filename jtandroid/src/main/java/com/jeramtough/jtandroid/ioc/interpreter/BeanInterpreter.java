@@ -2,6 +2,7 @@ package com.jeramtough.jtandroid.ioc.interpreter;
 
 import android.content.Context;
 
+import com.jeramtough.jtandroid.function.JtExecutors;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
 import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
@@ -13,6 +14,11 @@ import com.jeramtough.jtandroid.ioc.log.P;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * @author 11718
@@ -24,6 +30,8 @@ public class BeanInterpreter implements Interpreter {
     private NeededParamCaller neededParamCaller;
     private BeanAnnotationInfo beanAnnotationInfo;
 
+    private ExecutorService executorService;
+
     private long startInstanceTime = 0;
 
     private Constructor beUsedConstructor;
@@ -32,6 +40,8 @@ public class BeanInterpreter implements Interpreter {
         this.beanClass = beanClass;
         this.applicationContext = applicationContext;
         this.checkLegalityOfBean(beanClass);
+
+        executorService = JtExecutors.newCachedThreadPool();
     }
 
     @Override
@@ -39,14 +49,34 @@ public class BeanInterpreter implements Interpreter {
         Object beanInstance = null;
         startInstanceTime = System.currentTimeMillis() - startInstanceTime;
 
-        ArrayList<Object> constructorParameters = new ArrayList<>();
-        for (Class<?> paramClass : beUsedConstructor.getParameterTypes()) {
-            if (neededParamCaller != null) {
-                if (paramClass == Context.class) {
-                    constructorParameters.add(applicationContext);
-                } else {
-                    constructorParameters.add(neededParamCaller.getParamOfConstructor(paramClass));
+        List<Future<Object>> beanInstancesFutures = new ArrayList<>();
+
+        final ArrayList<Object> constructorParameters = new ArrayList<>();
+        for (final Class<?> paramClass : beUsedConstructor.getParameterTypes()) {
+            Future<Object> future = executorService.submit(new Callable<Object>() {
+                @Override
+                public Object call() {
+                    Object beanInstance = null;
+                    if (neededParamCaller != null) {
+                        if (paramClass == Context.class) {
+                            beanInstance = applicationContext;
+                        } else {
+                            beanInstance = neededParamCaller.getParamOfConstructor(paramClass);
+                        }
+                    }
+                    return beanInstance;
                 }
+            });
+            beanInstancesFutures.add(future);
+        }
+
+        P.info(beanInstancesFutures.size());
+
+        for (Future<Object> future : beanInstancesFutures) {
+            try {
+                constructorParameters.add(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         }
 
