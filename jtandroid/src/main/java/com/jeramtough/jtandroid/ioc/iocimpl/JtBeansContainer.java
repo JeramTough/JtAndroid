@@ -33,6 +33,7 @@ class JtBeansContainer implements BeansContainer, BeanInterpreter.NeededParamCal
         } else {
             beanInstance = beans.get(IocUtil.processKeyName(requiredBeanClass));
         }
+        
         switch (beanInterpreter.getBeanAnnotationInfo().getJtBeanPattern()) {
             case Singleton:
                 String beanKey = IocUtil.processKeyName(requiredBeanClass);
