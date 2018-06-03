@@ -4,39 +4,40 @@ import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.jeramtough.jtandroid.ioc.IocContext;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
-import com.jeramtough.jtandroid.ioc.IocContainer;
-import com.jeramtough.jtandroid.ioc.iocimpl.JtIocContainer;
+import com.jeramtough.jtandroid.ioc.iocimpl.IocContextImpl;
 
 /**
  * @author 11718
- *         on 2017  December 11 Monday 13:07.
+ * on 2017  December 11 Monday 13:07.
  */
 @JtController
-public class JtIocDialog extends Dialog
-{
-	public JtIocDialog(@NonNull Context context)
-	{
-		super(context);
-		getIocContainer().injectComponentAndService(getContext(), this);
-	}
-	
-	public JtIocDialog(@NonNull Context context, int themeResId)
-	{
-		super(context, themeResId);
-		getIocContainer().injectComponentAndService(getContext(), this);
-		
-	}
-	
-	public JtIocDialog(@NonNull Context context, boolean cancelable,
-			@Nullable OnCancelListener cancelListener)
-	{
-		super(context, cancelable, cancelListener);
-		getIocContainer().injectComponentAndService(getContext(), this);
-	}
-	
-	public IocContainer getIocContainer()
-	{
-		return JtIocContainer.getIocContainer();
-	}
+public class JtIocDialog extends Dialog {
+    private IocContext iocContext;
+
+    public JtIocDialog(@NonNull Context context) {
+        super(context);
+        iocContext = new IocContextImpl(context);
+        iocContext.injectBeansInto(this);
+    }
+
+    public JtIocDialog(@NonNull Context context, int themeResId) {
+        super(context, themeResId);
+        iocContext = new IocContextImpl(context);
+        iocContext.injectBeansInto(this);
+
+    }
+
+    public JtIocDialog(@NonNull Context context, boolean cancelable,
+                       @Nullable OnCancelListener cancelListener) {
+        super(context, cancelable, cancelListener);
+        iocContext = new IocContextImpl(context);
+        iocContext.injectBeansInto(this);
+    }
+
+    public IocContext getIocContext() {
+        return iocContext;
+    }
 }
