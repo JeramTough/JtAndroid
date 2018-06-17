@@ -1,6 +1,9 @@
 package com.jeramtough.jtandroiddemo.controller.activity;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -39,27 +42,18 @@ public class MainActivity extends JtIocActivity {
 
     private TextView textView;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.textView);
-        textView.setOnTouchListener(new OnTouchDoubleClickListener() {
-            @Override
-            public void onDoubleClick(View view) {
-                P.p(1);
-            }
-
-            @Override
-            public void onSingleClick(View view) {
-                P.p(2);
-            }
-
-            @Override
-            public void onLongClick(View view) {
-                P.p(3);
-            }
-        });
+        String content = "我叫<font color=\"#FF0000\">张小龙</font>";
+        if (Build.VERSION.SDK_INT >= 24) {
+            textView.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            textView.setText(Html.fromHtml(content));
+        }
     }
 }
