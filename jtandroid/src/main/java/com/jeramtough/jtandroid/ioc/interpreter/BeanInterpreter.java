@@ -9,7 +9,7 @@ import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
 import com.jeramtough.jtandroid.ioc.bean.BeanAnnotationInfo;
 import com.jeramtough.jtandroid.ioc.exception.BeanAnnotationIllegalException;
 import com.jeramtough.jtandroid.ioc.exception.BeanConstructorIllegalException;
-import com.jeramtough.jtandroid.ioc.log.P;
+import com.jeramtough.jtandroid.ioc.log.IocLog;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -87,7 +87,7 @@ public class BeanInterpreter implements Interpreter {
         }
 
         long endInstanceTime = System.currentTimeMillis();
-        P.info("Spend " + (endInstanceTime - startInstanceTime) + " millis second on instancing [" + beanClass.getName() + "]");
+        IocLog.info("Spend " + (endInstanceTime - startInstanceTime) + " millis second on instancing [" + beanClass.getName() + "]");
         return beanInstance;
     }
 

@@ -9,7 +9,7 @@ import com.jeramtough.jtandroid.ioc.annotation.JtController;
 import com.jeramtough.jtandroid.ioc.bean.JtField;
 import com.jeramtough.jtandroid.ioc.finder.JtFieldFinder;
 import com.jeramtough.jtandroid.ioc.finder.JtFieldFinderImpl;
-import com.jeramtough.jtandroid.ioc.log.P;
+import com.jeramtough.jtandroid.ioc.log.IocLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +97,7 @@ public class IocContextImpl implements IocContext {
         executorService.shutdown();
 
         long endInjectingTime = System.currentTimeMillis();
-        P.info("Speed " + (endInjectingTime - startInjectingTime)
+        IocLog.info("Speed " + (endInjectingTime - startInjectingTime)
                 + " millis second on injecting "
                 + jtFields.size()
                 + " beans into 【" + beInjectedObject.getClass().getName() + "】");

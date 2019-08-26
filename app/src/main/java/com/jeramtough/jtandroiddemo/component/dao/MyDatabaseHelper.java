@@ -6,14 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
-import com.jeramtough.jtlog3.WithLogger;
+import com.jeramtough.jtlog.with.WithJtLogger;
 
 /**
  * @author 11718
  * on 2018  May 03 Thursday 14:39.
  */
 @JtComponent
-public class MyDatabaseHelper extends SQLiteOpenHelper implements WithLogger
+public class MyDatabaseHelper extends SQLiteOpenHelper implements WithJtLogger
 {
 	private Context context;
 	

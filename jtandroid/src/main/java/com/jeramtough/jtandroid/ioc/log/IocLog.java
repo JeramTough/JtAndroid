@@ -5,7 +5,7 @@ import android.util.Log;
 /**
  * @author 11718
  */
-public class P {
+public class IocLog {
     private static String tag = "JtIoc";
 
     public static void info(String message) {

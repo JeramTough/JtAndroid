@@ -18,7 +18,8 @@ import com.jeramtough.jtandroiddemo.component.B;
 import com.jeramtough.jtandroiddemo.component.C;
 import com.jeramtough.jtandroiddemo.component.D;
 import com.jeramtough.jtandroiddemo.component.E;
-import com.jeramtough.jtlog3.P;
+import com.jeramtough.jtlog.annotation.JtLoggerConfig;
+import com.jeramtough.jtlog.facade.P;
 
 /**
  * @author 11718
@@ -55,5 +56,7 @@ public class MainActivity extends JtIocActivity {
         } else {
             textView.setText(Html.fromHtml(content));
         }
+
+        P.info("aa");
     }
 }
