@@ -1,6 +1,7 @@
 package com.jeramtough.jtandroid;
 
 import com.jeramtough.jtandroid.function.CountBetweenTime;
+import com.jeramtough.jtandroid.ioc.util.IocUtil;
 
 import org.junit.Test;
 
@@ -25,5 +26,10 @@ public class ExampleUnitTest
 		}
 		countBetweenTime.takeTime();
 		System.out.println(countBetweenTime.getIntervalTime());
+	}
+	
+	@Test
+	public void test1(){
+	    System.out.println(IocUtil.isJtBean(new Object()));
 	}
 }

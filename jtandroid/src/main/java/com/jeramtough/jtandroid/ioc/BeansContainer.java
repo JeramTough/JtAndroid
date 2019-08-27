@@ -2,6 +2,7 @@ package com.jeramtough.jtandroid.ioc;
 
 
 import com.jeramtough.jtandroid.ioc.bean.JtField;
+import com.jeramtough.jtandroid.ioc.exception.RegisterBeanException;
 
 /**
  * @author 11718
@@ -16,5 +17,18 @@ public interface BeansContainer {
 
     boolean isContainedBean(Class c);
 
-    void replaceBean(Object object);
+    /**
+     * 替换Bean
+     *
+     * @param bean Bean
+     */
+    void replaceBean(Object bean);
+
+    /**
+     *
+     * 将Bean注册到容器中
+     *
+     * @param bean Bean
+     */
+    void registerBean(Object bean) throws RegisterBeanException;
 }

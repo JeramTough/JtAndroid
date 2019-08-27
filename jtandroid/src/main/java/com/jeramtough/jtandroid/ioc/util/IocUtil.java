@@ -1,8 +1,13 @@
 package com.jeramtough.jtandroid.ioc.util;
 
+import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
+import com.jeramtough.jtandroid.ioc.annotation.JtController;
+import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -19,6 +24,19 @@ import java.util.jar.JarFile;
  */
 
 public class IocUtil {
+
+    public static boolean isJtBean(Object o) {
+        Annotation[] annotations = o.getClass().getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation instanceof JtComponent
+                    || annotation instanceof JtController
+                    || annotation instanceof JtServiceImpl) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String processKeyName(Field field) {
         String fieldName = field.getType().getName();
         return fieldName;
@@ -32,14 +50,14 @@ public class IocUtil {
     public static String toLowerCaseFirstOne(String s) {
         if (Character.isLowerCase(s.charAt(0))) {
             return s;
-        } else {
+        }
+        else {
             return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0)))
-                    .append(s.substring(1)).toString();
+                                        .append(s.substring(1)).toString();
         }
     }
 
-    public static String getDefaultImplClassName(Class serviceClass)
-    {
+    public static String getDefaultImplClassName(Class serviceClass) {
         String className = serviceClass.getName() + "Impl";
         return className;
     }
@@ -71,7 +89,8 @@ public class IocUtil {
                     // 以文件的方式扫描整个包下的文件 并添加到集合中
                     findAndAddClassesInPackageByFile(packageName, filePath,
                             recursive, classes);
-                } else if ("jar".equals(protocol)) {
+                }
+                else if ("jar".equals(protocol)) {
                     // 如果是jar包文件
                     // 定义一个JarFile
                     System.err.println("jar类型的扫描");
@@ -99,7 +118,7 @@ public class IocUtil {
                                 if (idx != -1) {
                                     // 获取包名 把"/"替换成"."
                                     packageName = name.substring(0, idx)
-                                            .replace('/', '.');
+                                                      .replace('/', '.');
                                 }
                                 // 如果可以迭代下去 并且是一个包
                                 if ((idx != -1) || recursive) {
@@ -115,7 +134,8 @@ public class IocUtil {
                                             classes.add(Class
                                                     .forName(packageName + '.'
                                                             + className));
-                                        } catch (ClassNotFoundException e) {
+                                        }
+                                        catch (ClassNotFoundException e) {
                                             // log
                                             // .error("添加用户自定义视图类错误 找不到此类的.class文件");
                                             e.printStackTrace();
@@ -124,13 +144,15 @@ public class IocUtil {
                                 }
                             }
                         }
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         // log.error("在扫描用户定义视图时从jar包获取文件出错");
                         e.printStackTrace();
                     }
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -142,7 +164,9 @@ public class IocUtil {
      * 以文件的形式来获取包下的所有Class
      */
     public static void findAndAddClassesInPackageByFile(String packageName,
-                                                        String packagePath, final boolean recursive, Set<Class<?>> classes) {
+                                                        String packagePath,
+                                                        final boolean recursive,
+                                                        Set<Class<?>> classes) {
         // 获取此包的目录 建立一个File
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
@@ -166,7 +190,8 @@ public class IocUtil {
                 findAndAddClassesInPackageByFile(packageName + "."
                                 + file.getName(), file.getAbsolutePath(), recursive,
                         classes);
-            } else {
+            }
+            else {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0,
                         file.getName().length() - 6);
@@ -174,8 +199,10 @@ public class IocUtil {
                     // 添加到集合中去
                     //classes.add(Class.forName(packageName + '.' + className));
                     //经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-                    classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
-                } catch (ClassNotFoundException e) {
+                    classes.add(Thread.currentThread().getContextClassLoader().loadClass(
+                            packageName + '.' + className));
+                }
+                catch (ClassNotFoundException e) {
                     // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
                     e.printStackTrace();
                 }
