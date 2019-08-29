@@ -18,6 +18,7 @@ import com.jeramtough.jtandroiddemo.component.B;
 import com.jeramtough.jtandroiddemo.component.C;
 import com.jeramtough.jtandroiddemo.component.D;
 import com.jeramtough.jtandroiddemo.component.E;
+import com.jeramtough.jtandroiddemo.component.G;
 import com.jeramtough.jtlog.annotation.JtLoggerConfig;
 import com.jeramtough.jtlog.facade.P;
 
@@ -40,6 +41,8 @@ public class MainActivity extends JtIocActivity {
     private D d;
     @InjectComponent
     private E e;
+    @InjectComponent
+    private G g;
 
     private TextView textView;
 
@@ -57,6 +60,6 @@ public class MainActivity extends JtIocActivity {
             textView.setText(Html.fromHtml(content));
         }
 
-        P.info("aa");
+        P.info(g.f==null);
     }
 }

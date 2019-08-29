@@ -8,6 +8,6 @@ public class BeanAnnotationIllegalException extends RuntimeException {
     public BeanAnnotationIllegalException(Class beanClass) {
         super("The bean[" + beanClass.getName()
                 + "] without the JtComponent annotation or" +
-                " the JtServiceImpl annotation");
+                " the JtServiceImpl annotation with ImplementClass");
     }
 }

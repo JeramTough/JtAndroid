@@ -3,6 +3,7 @@ package com.jeramtough.jtandroid.ioc.interpreter;
 import android.content.Context;
 
 import com.jeramtough.jtandroid.function.JtExecutors;
+import com.jeramtough.jtandroid.ioc.annotation.InjectComponent;
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
 import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
 import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
@@ -10,7 +11,9 @@ import com.jeramtough.jtandroid.ioc.bean.BeanAnnotationInfo;
 import com.jeramtough.jtandroid.ioc.exception.BeanAnnotationIllegalException;
 import com.jeramtough.jtandroid.ioc.exception.BeanConstructorIllegalException;
 import com.jeramtough.jtandroid.ioc.log.IocLog;
+import com.jeramtough.jtandroid.ioc.thread.GenerateBeanThread;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -21,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
- *
  * @author 11718
  */
 public class BeanInterpreter implements Interpreter {
@@ -53,15 +55,22 @@ public class BeanInterpreter implements Interpreter {
         List<Future<Object>> beanInstancesFutures = new ArrayList<>();
 
         final ArrayList<Object> constructorParameters = new ArrayList<>();
-        for (final Class<?> paramClass : beUsedConstructor.getParameterTypes()) {
-            Future<Object> future = executorService.submit(new Callable<Object>() {
+        for (int i = 0; i < beUsedConstructor.getParameterTypes().length; i++) {
+            Class paramClass=beUsedConstructor.getParameterTypes()[i];
+            Annotation[] paramAnnotations=beUsedConstructor.getParameterAnnotations()[i];
+            Future<Object> future=executorService.submit(new GenerateBeanThread(paramClass,
+                    paramAnnotations) {
                 @Override
                 public Object call() {
                     Object beanInstance = null;
                     if (neededParamCaller != null) {
                         if (paramClass == Context.class) {
                             beanInstance = applicationContext;
-                        } else {
+                        }
+                        else if (paramClass.isInterface()) {
+                            beanInstance = neededParamCaller.getParamOfConstructor(getBeanImplClass());
+                        }
+                        else {
                             beanInstance = neededParamCaller.getParamOfConstructor(paramClass);
                         }
                     }
@@ -70,11 +79,38 @@ public class BeanInterpreter implements Interpreter {
             });
             beanInstancesFutures.add(future);
         }
+        /*for (final Class<?> paramClass : beUsedConstructor.getParameterTypes()) {
+            Future<Object> future = executorService.submit(new Callable<Object>() {
+                @Override
+                public Object call() {
+                    Object beanInstance = null;
+                    if (neededParamCaller != null) {
+                        if (paramClass == Context.class) {
+                            beanInstance = applicationContext;
+                        }
+                        else if (paramClass.isInterface()) {
+                            InjectComponent injectComponentAnnotation =
+                                    paramClass.getAnnotation(InjectComponent.class);
+                            if (injectComponentAnnotation == null ||
+                                    injectComponentAnnotation.impl() == Object.class) {
+                                throw new BeanAnnotationIllegalException(paramClass);
+                            }
+                        }
+                        else {
+                            beanInstance = neededParamCaller.getParamOfConstructor(paramClass);
+                        }
+                    }
+                    return beanInstance;
+                }
+            });
+            beanInstancesFutures.add(future);
+        }*/
 
         for (Future<Object> future : beanInstancesFutures) {
             try {
                 constructorParameters.add(future.get());
-            } catch (InterruptedException | ExecutionException e) {
+            }
+            catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
@@ -83,12 +119,14 @@ public class BeanInterpreter implements Interpreter {
         try {
             beanInstance = beUsedConstructor.newInstance(constructorParameters
                     .toArray(new Object[constructorParameters.size()]));
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        }
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
         long endInstanceTime = System.currentTimeMillis();
-        IocLog.info("Spend " + (endInstanceTime - startInstanceTime) + " millis second on instancing [" + beanClass.getName() + "]");
+        IocLog.info(
+                "Spend " + (endInstanceTime - startInstanceTime) + " millis second on instancing [" + beanClass.getName() + "]");
         return beanInstance;
     }
 
@@ -110,7 +148,8 @@ public class BeanInterpreter implements Interpreter {
             beanAnnotationInfo = new BeanAnnotationInfo();
             beanAnnotationInfo.setJtBeanPattern(jtComponent.pattern());
         }
-        JtServiceImpl jtServiceImpl = (JtServiceImpl) beanClass.getAnnotation(JtServiceImpl.class);
+        JtServiceImpl jtServiceImpl = (JtServiceImpl) beanClass.getAnnotation(
+                JtServiceImpl.class);
         if (jtServiceImpl != null) {
             beanAnnotationInfo = new BeanAnnotationInfo();
             beanAnnotationInfo.setJtBeanPattern(jtServiceImpl.pattern());

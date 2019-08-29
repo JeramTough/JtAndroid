@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * @author Administrator
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 public @interface InjectComponent {
 
     Class impl() default Object.class;
