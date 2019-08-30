@@ -1,11 +1,8 @@
 package com.jeramtough.jtandroid;
 
 import com.jeramtough.jtandroid.function.CountBetweenTime;
-import com.jeramtough.jtandroid.ioc.util.IocUtil;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -30,6 +27,5 @@ public class ExampleUnitTest
 	
 	@Test
 	public void test1(){
-	    System.out.println(IocUtil.isJtBean(new Object()));
 	}
 }

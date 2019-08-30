@@ -2,7 +2,9 @@ package com.jeramtough.jtandroid.ioc.finder;
 
 import com.jeramtough.jtandroid.ioc.annotation.InjectComponent;
 import com.jeramtough.jtandroid.ioc.annotation.InjectService;
-import com.jeramtough.jtandroid.ioc.bean.JtField;
+import com.jeramtough.jtandroid.ioc.jtfield.DefaultJtFieldGenerator;
+import com.jeramtough.jtandroid.ioc.jtfield.JtField;
+import com.jeramtough.jtandroid.ioc.jtfield.JtFieldGenerator;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,14 +21,17 @@ public class JtFieldFinderImpl implements JtFieldFinder {
 
         Field[] fields = c.getDeclaredFields();
         for (Field field : fields) {
+
             InjectComponent injectComponent = field.getAnnotation(InjectComponent.class);
             JtField jtField = null;
+            JtFieldGenerator jtFieldGenerator = new DefaultJtFieldGenerator(field);
             if (injectComponent != null) {
-                jtField = new JtField(field, injectComponent.impl());
+                jtField = jtFieldGenerator.parse(injectComponent);
             }
+
             InjectService injectService = field.getAnnotation(InjectService.class);
             if (injectService != null) {
-                jtField = new JtField(field, injectService.impl());
+                jtField = jtFieldGenerator.parse(injectService);
             }
             if (jtField != null) {
                 jtFields.add(jtField);
@@ -34,4 +39,6 @@ public class JtFieldFinderImpl implements JtFieldFinder {
         }
         return jtFields;
     }
+
+
 }

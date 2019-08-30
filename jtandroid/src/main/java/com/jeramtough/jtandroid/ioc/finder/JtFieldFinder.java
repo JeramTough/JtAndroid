@@ -1,6 +1,6 @@
 package com.jeramtough.jtandroid.ioc.finder;
 
-import com.jeramtough.jtandroid.ioc.bean.JtField;
+import com.jeramtough.jtandroid.ioc.jtfield.JtField;
 
 import java.util.List;
 

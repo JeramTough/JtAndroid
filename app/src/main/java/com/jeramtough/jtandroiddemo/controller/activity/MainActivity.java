@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.text.Html;
-import android.view.View;
 import android.widget.TextView;
 
 import com.jeramtough.jtandroid.controller.activity.JtIocActivity;
@@ -19,8 +18,7 @@ import com.jeramtough.jtandroiddemo.component.C;
 import com.jeramtough.jtandroiddemo.component.D;
 import com.jeramtough.jtandroiddemo.component.E;
 import com.jeramtough.jtandroiddemo.component.G;
-import com.jeramtough.jtlog.annotation.JtLoggerConfig;
-import com.jeramtough.jtlog.facade.P;
+import com.jeramtough.jtlog.facade.L;
 
 /**
  * @author 11718
@@ -60,6 +58,6 @@ public class MainActivity extends JtIocActivity {
             textView.setText(Html.fromHtml(content));
         }
 
-        P.info(g.f==null);
+        L.info(g.f==null);
     }
 }

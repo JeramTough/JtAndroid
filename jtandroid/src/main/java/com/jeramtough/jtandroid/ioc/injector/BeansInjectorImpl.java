@@ -1,11 +1,6 @@
 package com.jeramtough.jtandroid.ioc.injector;
 
-import com.jeramtough.jtandroid.ioc.BeansContainer;
-import com.jeramtough.jtandroid.ioc.annotation.InjectComponent;
-import com.jeramtough.jtandroid.ioc.annotation.InjectService;
-import com.jeramtough.jtandroid.ioc.bean.JtField;
-
-import java.lang.reflect.Field;
+import com.jeramtough.jtandroid.ioc.container.BeansContainer;
 
 /**
  * @author 11718
@@ -21,7 +16,7 @@ public class BeansInjectorImpl implements BeansInjector {
 
     @Override
     public void inject(Class handleBeansClass, Object beInjectedObject) {
-        Field[] fields = handleBeansClass.getDeclaredFields();
+       /* Field[] fields = handleBeansClass.getDeclaredFields();
         for (Field field : fields) {
             InjectComponent injectComponent = field.getAnnotation(InjectComponent.class);
             JtField jtField = null;
@@ -45,7 +40,7 @@ public class BeansInjectorImpl implements BeansInjector {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
     }
 
 }

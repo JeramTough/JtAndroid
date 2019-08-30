@@ -5,9 +5,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.jeramtough.jtandroid.ioc.IocContext;
+import com.jeramtough.jtandroid.ioc.context.IocContext;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
-import com.jeramtough.jtandroid.ioc.iocimpl.IocContextImpl;
+import com.jeramtough.jtandroid.ioc.context.IocContextImpl;
 
 /**
  * @author 11718

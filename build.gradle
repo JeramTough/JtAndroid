@@ -17,8 +17,15 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "E:\\Environment\\maven\\repository" }
+        maven { url "D:\\Developer\\Environment\\maven\\repository" }
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+        mavenCentral()
         google()
         jcenter()
+        maven { url 'https://oss.sonatype.org/content/groups/public/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        mavenLocal()
     }
 }
 
