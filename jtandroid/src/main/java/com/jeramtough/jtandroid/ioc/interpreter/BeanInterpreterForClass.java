@@ -1,16 +1,13 @@
 package com.jeramtough.jtandroid.ioc.interpreter;
 
-import android.content.Context;
-
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
-import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
-import com.jeramtough.jtandroid.ioc.annotation.JtServiceImpl;
-import com.jeramtough.jtandroid.ioc.bean.BeanAnnotationInfo;
 import com.jeramtough.jtandroid.ioc.container.JtBeansContainer;
-import com.jeramtough.jtandroid.ioc.exception.BeanAnnotationIllegalException;
 import com.jeramtough.jtandroid.ioc.exception.BeanConstructorIllegalException;
+import com.jeramtough.jtandroid.ioc.implfinder.DefaultInterfaceImplFinder;
+import com.jeramtough.jtandroid.ioc.implfinder.InterfaceImplFinder;
 import com.jeramtough.jtandroid.ioc.log.IocLog;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -19,41 +16,50 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
+ * 使用Class生成Bean实例
+ *
  * @author 11718
  */
-public class BeanInterpreter2 implements Interpreter {
+public class BeanInterpreterForClass implements BeanInterpreter {
 
-    private Context applicationContext;
     private Class beanClass;
-    private BeanAnnotationInfo beanAnnotationInfo;
 
-    private long startInstanceTime = 0;
 
-    private Constructor beUsedConstructor;
-
-    public BeanInterpreter2(Context applicationContext, Class beanClass) {
+    public BeanInterpreterForClass(Class beanClass) {
         this.beanClass = beanClass;
-        this.applicationContext = applicationContext;
-        this.checkLegalityOfBean(beanClass);
-
     }
 
     @Override
     public Object getBeanInstance() {
+        long startInstanceTime = System.currentTimeMillis();
+
+        Constructor beUsedConstructor = this.parseBeUsedConstructor(beanClass);
+
         Object beanInstance = null;
-        startInstanceTime = System.currentTimeMillis() - startInstanceTime;
 
         List<Future<Class>> beanClassFutureList = new ArrayList<>();
 
         final ArrayList<Object> constructorParamInstanceList = new ArrayList<>();
         for (int i = 0; i < beUsedConstructor.getParameterTypes().length; i++) {
             Class paramClass = beUsedConstructor.getParameterTypes()[i];
-//            Annotation[] paramAnnotations = beUsedConstructor.getParameterAnnotations()[i];
-            Future<Class> future = JtBeansContainer.getInstance().registerBeanAsync(
-                    paramClass);
-            if (future != null) {
-                beanClassFutureList.add(future);
+            Annotation[] paramAnnotations = beUsedConstructor.getParameterAnnotations()[i];
+
+            Future<Class> future;
+            if (paramClass.isInterface()) {
+                InterfaceImplFinder interfaceImplFinder =
+                        new DefaultInterfaceImplFinder(beanClass, paramClass,
+                                paramAnnotations);
+                Class paramClassImpl = interfaceImplFinder.find();
+                future = JtBeansContainer.getInstance().registerBeanAsync(
+                        paramClassImpl);
             }
+            else {
+                future = JtBeansContainer.getInstance().registerBeanAsync(
+                        paramClass);
+            }
+
+
+            beanClassFutureList.add(future);
         }
 
         for (Future<Class> future : beanClassFutureList) {
@@ -82,41 +88,20 @@ public class BeanInterpreter2 implements Interpreter {
         return beanInstance;
     }
 
-    @Override
-    public BeanAnnotationInfo getBeanAnnotationInfo() {
-        return beanAnnotationInfo;
-    }
-
 
     //**********************
 
-    private void checkLegalityOfBean(Class beanClass) {
-        startInstanceTime = System.currentTimeMillis();
-
-        JtComponent jtComponent = (JtComponent) beanClass.getAnnotation(JtComponent.class);
-        if (jtComponent != null) {
-            beanAnnotationInfo = new BeanAnnotationInfo();
-            beanAnnotationInfo.setJtBeanPattern(jtComponent.pattern());
-        }
-        JtServiceImpl jtServiceImpl = (JtServiceImpl) beanClass.getAnnotation(
-                JtServiceImpl.class);
-        if (jtServiceImpl != null) {
-            beanAnnotationInfo = new BeanAnnotationInfo();
-            beanAnnotationInfo.setJtBeanPattern(jtServiceImpl.pattern());
-        }
-        if (beanAnnotationInfo == null) {
-            throw new BeanAnnotationIllegalException(beanClass);
-        }
+    private Constructor parseBeUsedConstructor(Class beanClass) {
 
         Constructor[] constructors = beanClass.getDeclaredConstructors();
-
+        Constructor beUsedConstructor = null;
         for (Constructor constructor : constructors) {
             if (constructor.getAnnotation(IocAutowire.class) != null) {
-                this.beUsedConstructor = constructor;
+                beUsedConstructor = constructor;
                 break;
             }
             if (constructor.getParameterTypes().length == 0) {
-                this.beUsedConstructor = constructor;
+                beUsedConstructor = constructor;
                 break;
             }
         }
@@ -124,7 +109,9 @@ public class BeanInterpreter2 implements Interpreter {
             throw new BeanConstructorIllegalException(beanClass);
         }
 
-        startInstanceTime = System.currentTimeMillis() - startInstanceTime;
+        return beUsedConstructor;
+
     }
+
 
 }

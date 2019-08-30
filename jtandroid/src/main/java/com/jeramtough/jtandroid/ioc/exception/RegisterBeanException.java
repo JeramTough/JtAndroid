@@ -6,8 +6,8 @@ package com.jeramtough.jtandroid.ioc.exception;
  */
 public class RegisterBeanException extends RuntimeException {
 
-    public RegisterBeanException() {
-        super("The bean must be annotation the @JtComponent or @JtServiceImpl or " +
-                "@JtController");
+    public RegisterBeanException(String message) {
+        super(message);
     }
+
 }

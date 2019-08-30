@@ -1,4 +1,4 @@
-package com.jeramtough.jtandroid.ioc.jtfield;
+package com.jeramtough.jtandroid.ioc.bean;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -17,7 +17,10 @@ public class JtField {
      */
     private Class implClass;
 
-    JtField(Field field, Class implClass) {
+    public JtField() {
+    }
+
+    public JtField(Field field, Class implClass) {
         this.field = field;
         this.implClass = implClass;
     }

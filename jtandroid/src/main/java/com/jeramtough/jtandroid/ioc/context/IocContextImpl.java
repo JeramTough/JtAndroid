@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.jeramtough.jtandroid.ioc.container.BeansContainer;
 import com.jeramtough.jtandroid.ioc.container.JtBeansContainer;
-import com.jeramtough.jtandroid.ioc.jtfield.JtField;
+import com.jeramtough.jtandroid.ioc.bean.JtField;
 import com.jeramtough.jtandroid.ioc.log.IocLog;
 import com.jeramtough.jtandroid.ioc.util.JtControllerUtil;
 
@@ -29,7 +29,7 @@ public class IocContextImpl implements IocContext {
         initJtBeansContainer();
     }
 
-    void initJtBeansContainer() {
+    private void initJtBeansContainer() {
         JtBeansContainer.init(context.getApplicationContext());
     }
 
@@ -66,7 +66,7 @@ public class IocContextImpl implements IocContext {
         IocLog.info("Speed " + (endInjectingTime - startInjectingTime)
                 + " millis second on injecting "
                 + jtFields.size()
-                + " beans into 【" + jtControllerObject.getClass().getName() + "】");
+                + " beans into JtController【" + jtControllerObject.getClass().getName() + "】");
     }
 
     @Override

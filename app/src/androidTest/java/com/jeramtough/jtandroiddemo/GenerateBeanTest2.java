@@ -17,7 +17,6 @@ import com.jeramtough.jtandroiddemo.component.C;
 import com.jeramtough.jtandroiddemo.component.D;
 import com.jeramtough.jtandroiddemo.component.E;
 import com.jeramtough.jtandroiddemo.component.G;
-import com.jeramtough.jtandroiddemo.component.H;
 import com.jeramtough.jtlog.facade.L;
 
 import org.junit.Test;
@@ -44,6 +43,10 @@ public class GenerateBeanTest2 {
     private C c;
     @InjectComponent
     private D d;
+    @InjectComponent
+    private E e;
+    @InjectComponent
+    private G g;
 
 
     @Test

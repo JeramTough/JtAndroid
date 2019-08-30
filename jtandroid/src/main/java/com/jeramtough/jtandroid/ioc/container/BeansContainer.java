@@ -3,6 +3,7 @@ package com.jeramtough.jtandroid.ioc.container;
 
 import android.support.annotation.NonNull;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.Future;
 
 /**
@@ -56,7 +57,7 @@ public interface BeansContainer {
      */
     void registerBean(Class beanClass);
 
-
     Future<Class> registerBeanAsync(Class beanClass);
+
 
 }

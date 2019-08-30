@@ -2,10 +2,11 @@ package com.jeramtough.jtandroid.ioc.util;
 
 import com.jeramtough.jtandroid.function.JtExecutors;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
-import com.jeramtough.jtandroid.ioc.finder.JtFieldFinderImpl;
-import com.jeramtough.jtandroid.ioc.jtfield.JtField;
-import com.jeramtough.jtandroid.ioc.finder.JtFieldFinder;
+import com.jeramtough.jtandroid.ioc.bean.JtField;
+import com.jeramtough.jtandroid.ioc.implfinder.DefaultInterfaceImplFinder;
+import com.jeramtough.jtandroid.ioc.implfinder.InterfaceImplFinder;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,8 +24,6 @@ public class JtControllerUtil {
     public static List<JtField> findJtFieldsFromJtController(Object jtControllerObject) {
 
         ExecutorService service = JtExecutors.newCachedThreadPool();
-
-        final JtFieldFinder jtFieldFinder = new JtFieldFinderImpl();
         List<Future<List<JtField>>> jtFieldsFutures = new ArrayList<>();
 
         //traverse all the JtController to find the JtFields.
@@ -36,7 +35,7 @@ public class JtControllerUtil {
                         @Override
                         public List<JtField> call() {
                             if (finalC.getAnnotation(JtController.class) != null) {
-                                return jtFieldFinder.findJtFieldFromClass(finalC);
+                                return findJtFieldsFromJtControllerClass(finalC);
                             }
                             return null;
                         }
@@ -61,4 +60,29 @@ public class JtControllerUtil {
         return jtFields;
     }
 
+
+    //***********************
+
+    private static List<JtField> findJtFieldsFromJtControllerClass(Class jtControllerClass) {
+        List<JtField> jtFields = new ArrayList<>();
+
+        Field[] fields = jtControllerClass.getDeclaredFields();
+        for (Field field : fields) {
+            JtField jtField = new JtField();
+            if (field.getType().isInterface()) {
+                Class interfaceClass = field.getType();
+                InterfaceImplFinder interfaceImplFinder =
+                        new DefaultInterfaceImplFinder(jtControllerClass, interfaceClass,
+                                field.getDeclaredAnnotations());
+                jtField.setField(field);
+                jtField.setImplClass(interfaceImplFinder.find());
+            }
+            else {
+                jtField.setField(field);
+                jtField.setImplClass(field.getType());
+            }
+            jtFields.add(jtField);
+        }
+        return jtFields;
+    }
 }

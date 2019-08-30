@@ -3,11 +3,10 @@ package com.jeramtough.jtandroid.ioc.container;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.jeramtough.jtandroid.ioc.interpreter.BeanInterpreter2;
-import com.jeramtough.jtandroid.ioc.interpreter.Interpreter;
+import com.jeramtough.jtandroid.ioc.interpreter.BeanInterpreterForClass;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThread;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThreadPool;
-import com.jeramtough.jtandroid.ioc.util.IocUtil;
+import com.jeramtough.jtandroid.ioc.util.JtBeanUtil;
 
 import java.util.Objects;
 import java.util.concurrent.Future;
@@ -20,7 +19,7 @@ public class RegisterBeansContainer extends BaseBeansContainer
         implements BeansContainer {
 
 
-    public RegisterBeansContainer(Context applicationContext) {
+    RegisterBeansContainer(Context applicationContext) {
         super(applicationContext);
     }
 
@@ -32,7 +31,7 @@ public class RegisterBeansContainer extends BaseBeansContainer
     @Override
     public void registerBean(@NonNull Object bean) {
         Objects.requireNonNull(bean);
-        super.beansMap.put(IocUtil.processKeyName(bean.getClass()), bean);
+        super.beansMap.put(JtBeanUtil.processKeyName(bean.getClass()), bean);
     }
 
     @Override
@@ -47,17 +46,13 @@ public class RegisterBeansContainer extends BaseBeansContainer
 
         if (!isContainedBean(beanClass)) {
 
-            if (beanClass.isInterface()) {
-                throw new IllegalArgumentException("beanClass can't be a class of interface");
-            }
+            JtBeanUtil.checkBeanClass(beanClass);
 
-            Interpreter beanInterpreter = new BeanInterpreter2(applicationContext,
-                    beanClass);
-            Object beanInstance = beanInterpreter.getBeanInstance();
+            Object beanInstance = new BeanInterpreterForClass(beanClass).getBeanInstance();
 
-            switch (beanInterpreter.getBeanAnnotationInfo().getJtBeanPattern()) {
+            switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
                 case Singleton:
-                    String beanKey = IocUtil.processKeyName(beanClass);
+                    String beanKey = JtBeanUtil.processKeyName(beanClass);
                     super.beansMap.put(beanKey, beanInstance);
                     break;
                 case Prototype:
@@ -73,7 +68,7 @@ public class RegisterBeansContainer extends BaseBeansContainer
         Future<Class> classFuture = RegisterBeanThreadPool.getInstance().submit(
                 new RegisterBeanThread(beanClass) {
                     @Override
-                    public Class call() throws Exception {
+                    public Class call() {
                         if (!isContainedBean(beanClass)) {
                             registerBean(beanClass);
                         }
@@ -83,5 +78,8 @@ public class RegisterBeansContainer extends BaseBeansContainer
 
         return classFuture;
     }
+
+    //***************************
+
 
 }
