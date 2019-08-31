@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.jeramtough.jtandroid.ioc.annotation.JtBeanPattern;
+import com.jeramtough.jtandroid.ioc.exception.RegisterBeanException;
 import com.jeramtough.jtandroid.ioc.interpreter.BeanInterpreterForClass;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThread;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThreadPool;
@@ -35,6 +36,8 @@ public class RegisterBeansContainer extends BaseBeansContainer
             case Prototype:
                 putPrototypeBean(bean.getClass(), bean);
                 break;
+            case Context:
+                throw new RegisterBeanException("The bean patten can't be the Context");
             default:
         }
     }
@@ -61,21 +64,6 @@ public class RegisterBeansContainer extends BaseBeansContainer
             default:
         }
 
-       /* if (!isContainedBean(beanClass)) {
-
-            JtBeanUtil.checkBeanClass(beanClass);
-
-            Object beanInstance = new BeanInterpreterForClass(beanClass).getBeanInstance();
-
-            switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
-                case Singleton:
-                    putSingletonBean(beanClass, beanInstance);
-                    break;
-                case Prototype:
-                    putPrototypeBean(beanClass, beanInstance);
-                default:
-            }
-        }*/
     }
 
 
