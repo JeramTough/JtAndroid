@@ -7,6 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.jeramtough.jtandroid.function.MusicPlayer;
 import com.jeramtough.jtandroid.ioc.annotation.InjectComponent;
 import com.jeramtough.jtandroid.ioc.annotation.InjectService;
+import com.jeramtough.jtandroid.ioc.annotation.JtBeanPattern;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
 import com.jeramtough.jtandroid.ioc.context.IocContext;
 import com.jeramtough.jtandroid.ioc.context.IocContextImpl;
@@ -23,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * Instrumented injectTest, which will execute on an Android device.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
@@ -37,8 +38,13 @@ public class GenerateBeanTest2 {
     private MusicPlayer musicPlayer;
     @InjectComponent
     private A a;
+
     @InjectComponent
     private B b;
+
+    @InjectComponent
+    private B b1;
+
     @InjectComponent
     private C c;
     @InjectComponent
@@ -50,13 +56,40 @@ public class GenerateBeanTest2 {
 
 
     @Test
-    public void test() {
-        // Context of the app under test.
+    public void injectTest() {
+        // Context of the app under injectTest.
         Context appContext = InstrumentationRegistry.getTargetContext();
         IocContext iocContext = new IocContextImpl(appContext);
 
         iocContext.injectBeansInto(this);
 
-        L.arrive();
+        L.debugs(testService == null, musicPlayer == null, a == null, b == null,
+                b1 == null, c == null,
+                d == null, e == null,
+                g == null, g.f == null);
+    }
+
+    @Test
+    public void injectCustomObject() {
+        class Custom {
+
+        }
+        Custom custom1 = new Custom();
+        Custom custom2 = new Custom();
+
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        IocContext iocContext = new IocContextImpl(appContext);
+        iocContext.getBeansContainer().registerBean(custom1, JtBeanPattern.Singleton);
+        L.debugs(iocContext.getBeansContainer().getBean(Custom.class) == null);
+
+
+        //replace test
+        L.debugs(iocContext.getBeansContainer().getBean(Custom.class) == custom2,
+                iocContext.getBeansContainer().getBean(Custom.class) == custom1);
+        iocContext.getBeansContainer().replaceBean(custom2);
+        L.debugs(iocContext.getBeansContainer().getBean(Custom.class) == custom2,
+                iocContext.getBeansContainer().getBean(Custom.class) == custom1);
+
+
     }
 }

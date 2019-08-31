@@ -15,5 +15,10 @@ public enum JtBeanPattern
 	/**
 	 * new instance each
 	 */
-	Prototype
+	Prototype,
+
+	/**
+	 * android context
+	 */
+	Context
 }

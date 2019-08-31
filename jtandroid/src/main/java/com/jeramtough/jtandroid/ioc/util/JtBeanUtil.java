@@ -1,5 +1,7 @@
 package com.jeramtough.jtandroid.ioc.util;
 
+import android.app.Application;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.jeramtough.jtandroid.ioc.annotation.JtBeanPattern;
@@ -42,7 +44,7 @@ public class JtBeanUtil {
         }
 
         if (!JtBeanUtil.isJtBean(beanClass)) {
-            throw new IllegalArgumentException(
+            throw new RegisterBeanException(
                     String.format(
                             "The bean[%s] must be annotation the @JtComponent or @JtServiceImpl " +
                                     "or @JtController", beanClass.getName()));
@@ -69,9 +71,20 @@ public class JtBeanUtil {
             jtBeanPattern = jtServiceImpl.pattern();
         }
 
-       /* if (jtBeanPattern == null) {
-            System.out.println("a");
-        }*/
+        if (beanClass == Application.class || beanClass == Context.class) {
+            jtBeanPattern = JtBeanPattern.Context;
+        }
+        if (jtBeanPattern == null) {
+            Class tempClass = beanClass;
+            while (tempClass.getSuperclass() != null) {
+                tempClass = tempClass.getSuperclass();
+                if (tempClass == Application.class || tempClass == Context.class) {
+                    jtBeanPattern = JtBeanPattern.Context;
+                    break;
+                }
+            }
+        }
+
 
         Objects.requireNonNull(jtBeanPattern);
         return jtBeanPattern;

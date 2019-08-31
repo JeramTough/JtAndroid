@@ -78,10 +78,6 @@ public class RegisterBeanThreadPool {
         return future;
     }
 
-    public synchronized void removeRegisterBeanFuture(Class beanClass) {
-        allRegisterBeanFutureMap.remove(beanClass);
-    }
-
     public synchronized void clearRegisterBeanFutures() {
         allRegisterBeanFutureMap.clear();
     }

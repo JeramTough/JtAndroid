@@ -3,6 +3,7 @@ package com.jeramtough.jtandroid.ioc.container;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.jeramtough.jtandroid.ioc.annotation.JtBeanPattern;
 import com.jeramtough.jtandroid.ioc.interpreter.BeanInterpreterForClass;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThread;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThreadPool;
@@ -23,28 +24,44 @@ public class RegisterBeansContainer extends BaseBeansContainer
         super(applicationContext);
     }
 
-    @Override
-    public void replaceBean(@NonNull Object bean) {
-        registerBean(bean);
-    }
 
     @Override
-    public void registerBean(@NonNull Object bean) {
+    public void registerBean(@NonNull Object bean, JtBeanPattern jtBeanPattern) {
         Objects.requireNonNull(bean);
-        super.beansMap.put(JtBeanUtil.processKeyName(bean.getClass()), bean);
-    }
-
-    @Override
-    public void registerBean(String aliasName, @NonNull Object bean) {
-        Objects.requireNonNull(bean);
-        super.beansMap.put(aliasName, bean);
+        switch (jtBeanPattern) {
+            case Singleton:
+                putSingletonBean(bean.getClass(), bean);
+                break;
+            case Prototype:
+                putPrototypeBean(bean.getClass(), bean);
+                break;
+            default:
+        }
     }
 
 
     @Override
     public void registerBean(Class beanClass) {
 
-        if (!isContainedBean(beanClass)) {
+        switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
+            case Singleton:
+                if (!isContainedSingletonBean(beanClass)) {
+                    JtBeanUtil.checkBeanClass(beanClass);
+                    Object beanInstance = new BeanInterpreterForClass(
+                            beanClass).getBeanInstance();
+                    putSingletonBean(beanClass, beanInstance);
+                }
+                break;
+            case Prototype:
+                JtBeanUtil.checkBeanClass(beanClass);
+                Object beanInstance = new BeanInterpreterForClass(
+                        beanClass).getBeanInstance();
+                putPrototypeBean(beanClass, beanInstance);
+            case Context:
+            default:
+        }
+
+       /* if (!isContainedBean(beanClass)) {
 
             JtBeanUtil.checkBeanClass(beanClass);
 
@@ -52,14 +69,13 @@ public class RegisterBeansContainer extends BaseBeansContainer
 
             switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
                 case Singleton:
-                    String beanKey = JtBeanUtil.processKeyName(beanClass);
-                    super.beansMap.put(beanKey, beanInstance);
+                    putSingletonBean(beanClass, beanInstance);
                     break;
                 case Prototype:
-                    //do not anything
+                    putPrototypeBean(beanClass, beanInstance);
                 default:
             }
-        }
+        }*/
     }
 
 
@@ -69,10 +85,7 @@ public class RegisterBeansContainer extends BaseBeansContainer
                 new RegisterBeanThread(beanClass) {
                     @Override
                     public Class call() {
-
-                        if (!isContainedBean(beanClass)) {
-                            registerBean(beanClass);
-                        }
+                        registerBean(beanClass);
                         return beanClass;
                     }
                 });

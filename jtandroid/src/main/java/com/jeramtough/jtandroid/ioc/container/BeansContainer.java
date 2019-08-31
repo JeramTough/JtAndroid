@@ -3,7 +3,8 @@ package com.jeramtough.jtandroid.ioc.container;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Field;
+import com.jeramtough.jtandroid.ioc.annotation.JtBeanPattern;
+
 import java.util.concurrent.Future;
 
 /**
@@ -27,33 +28,32 @@ public interface BeansContainer {
 
     boolean isContainedBean(Class c);
 
+
+    boolean isContainedSingletonBean(Class c);
+
+
+    boolean isContainedPrototypeBean(Class c);
+
     /**
      * replace Bean
      *
-     * @param bean bean can be plain java object
+     * @param bean bean can be plain java object but must be a single mode bean.
      */
     void replaceBean(@NonNull Object bean);
 
     /**
      * register bean instance into the IocContainer.
      *
-     * @param bean bean can be plain java object
+     * @param bean          bean can be plain java object
+     * @param jtBeanPattern {@link JtBeanPattern}
      */
-    void registerBean(@NonNull Object bean);
-
-    /**
-     * register bean instance into the IocContainer.
-     *
-     * @param aliasName custom name of bean instance
-     * @param bean      bean can be plain java object
-     */
-    void registerBean(String aliasName, @NonNull Object bean);
+    void registerBean(@NonNull Object bean, JtBeanPattern jtBeanPattern);
 
 
     /**
      * register and instance bean into the IocContainer by class of bean
      *
-     * @param beanClass beanClass can't be a class of interface
+     * @param beanClass beanClass can't be a class of interface.
      */
     void registerBean(Class beanClass);
 
