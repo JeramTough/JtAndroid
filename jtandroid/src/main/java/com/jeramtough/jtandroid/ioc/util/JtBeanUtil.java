@@ -68,6 +68,11 @@ public class JtBeanUtil {
         if (jtServiceImpl != null) {
             jtBeanPattern = jtServiceImpl.pattern();
         }
+
+       /* if (jtBeanPattern == null) {
+            System.out.println("a");
+        }*/
+
         Objects.requireNonNull(jtBeanPattern);
         return jtBeanPattern;
     }

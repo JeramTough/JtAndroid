@@ -4,12 +4,17 @@ import android.content.Context;
 
 import com.jeramtough.jtandroid.ioc.exception.DontInitException;
 
+/**
+ * 2019-8-30
+ *
+ * @author 11718
+ */
 public class JtBeansContainer extends RegisterBeansContainer implements BeansContainer {
 
     private volatile static JtBeansContainer jtBeansContainer;
 
 
-    public JtBeansContainer(Context applicationContext) {
+    private JtBeansContainer(Context applicationContext) {
         super(applicationContext);
     }
 

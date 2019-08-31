@@ -46,7 +46,7 @@ public class DefaultInterfaceImplFinder implements InterfaceImplFinder {
         }
 
         throw new DontFindInterfaceImplException(
-                String.format("The interface instance[%s] don't have " +
+                String.format("The instance of interface[%s] don't have " +
                                 "@InjectComponent or @InjectService in [%s]",
                         interfaceClass.getName(), mainClass.getName()));
     }

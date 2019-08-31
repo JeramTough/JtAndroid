@@ -12,6 +12,7 @@ import com.jeramtough.jtandroid.ioc.annotation.JtComponent;
 public class G {
 
     private E e;
+
     public F f;
 
     @IocAutowire

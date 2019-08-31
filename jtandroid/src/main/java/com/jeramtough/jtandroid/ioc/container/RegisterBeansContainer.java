@@ -64,11 +64,12 @@ public class RegisterBeansContainer extends BaseBeansContainer
 
 
     @Override
-    public Future<Class> registerBeanAsync(Class beanClass) {
+    public Future<Class> registerBeanAsync(final Class beanClass) {
         Future<Class> classFuture = RegisterBeanThreadPool.getInstance().submit(
                 new RegisterBeanThread(beanClass) {
                     @Override
                     public Class call() {
+
                         if (!isContainedBean(beanClass)) {
                             registerBean(beanClass);
                         }
