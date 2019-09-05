@@ -1,7 +1,7 @@
 package com.jeramtough.jtandroid.ioc.interpreter;
 
 import com.jeramtough.jtandroid.ioc.annotation.IocAutowire;
-import com.jeramtough.jtandroid.ioc.container.JtBeansContainer;
+import com.jeramtough.jtandroid.ioc.container.JtBeanContainer;
 import com.jeramtough.jtandroid.ioc.exception.BeanConstructorIllegalException;
 import com.jeramtough.jtandroid.ioc.implfinder.DefaultInterfaceImplFinder;
 import com.jeramtough.jtandroid.ioc.implfinder.InterfaceImplFinder;
@@ -40,6 +40,7 @@ public class BeanInterpreterForClass implements BeanInterpreter {
         List<Future<Class>> beanClassFutureList = new ArrayList<>();
 
         final ArrayList<Object> constructorParamInstanceList = new ArrayList<>();
+//        final Map<Class,Object> constructorParamInstanceList = new HashMap<>();
         for (int i = 0; i < beUsedConstructor.getParameterTypes().length; i++) {
             Class paramClass = beUsedConstructor.getParameterTypes()[i];
             Annotation[] paramAnnotations = beUsedConstructor.getParameterAnnotations()[i];
@@ -50,11 +51,11 @@ public class BeanInterpreterForClass implements BeanInterpreter {
                         new DefaultInterfaceImplFinder(beanClass, paramClass,
                                 paramAnnotations);
                 Class paramClassImpl = interfaceImplFinder.find();
-                future = JtBeansContainer.getInstance().registerBeanAsync(
+                future = JtBeanContainer.getInstance().registerBeanAsync(
                         paramClassImpl);
             }
             else {
-                future = JtBeansContainer.getInstance().registerBeanAsync(
+                future = JtBeanContainer.getInstance().registerBeanAsync(
                         paramClass);
             }
 
@@ -66,7 +67,7 @@ public class BeanInterpreterForClass implements BeanInterpreter {
             try {
                 Class beanClass = future.get();
                 constructorParamInstanceList.add(
-                        JtBeansContainer.getInstance().getBean(beanClass));
+                        JtBeanContainer.getInstance().getBean(beanClass));
             }
             catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

@@ -10,14 +10,14 @@ import com.jeramtough.jtandroiddemo.component.dao.mapper.ShallLearningMapper;
  * on 2018  May 02 Wednesday 20:45.
  */
 @JtServiceImpl
-class TestServiceImpl implements TestService
+public class TestServiceImpl implements TestService
 {
 	
 	private Context context;
 	private ShallLearningMapper shallLearningMapper;
 	
 	@IocAutowire
-	TestServiceImpl(Context context, ShallLearningMapper shallLearningMapper)
+	public TestServiceImpl(Context context, ShallLearningMapper shallLearningMapper)
 	{
 		this.context = context;
 		this.shallLearningMapper = shallLearningMapper;

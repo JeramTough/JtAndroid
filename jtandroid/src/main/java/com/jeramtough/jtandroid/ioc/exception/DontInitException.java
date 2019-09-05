@@ -7,6 +7,6 @@ package com.jeramtough.jtandroid.ioc.exception;
 public class DontInitException extends RuntimeException {
 
     public DontInitException() {
-        super("The BeansContainer don't init");
+        super("The BeanContainer don't init");
     }
 }

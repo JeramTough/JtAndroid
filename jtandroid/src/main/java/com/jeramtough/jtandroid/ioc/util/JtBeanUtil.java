@@ -95,5 +95,17 @@ public class JtBeanUtil {
         return className;
     }
 
+    public static String getDefaultImplClassName1(Class serviceClass) {
+        String className = serviceClass.getPackage().getName()
+                + ".impl." + serviceClass.getSimpleName() +
+                "Impl";
+        return className;
+    }
 
+
+    public static String getDefaultComponentClassName(Class interfaceClass) {
+        String className = interfaceClass.getPackage().getName()
+                + ".Default" + interfaceClass.getSimpleName();
+        return className;
+    }
 }

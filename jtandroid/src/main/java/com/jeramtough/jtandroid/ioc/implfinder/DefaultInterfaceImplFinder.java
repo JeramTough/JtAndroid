@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.jeramtough.jtandroid.ioc.annotation.InjectComponent;
 import com.jeramtough.jtandroid.ioc.annotation.InjectService;
+import com.jeramtough.jtandroid.ioc.container.JtBeanContainer;
 import com.jeramtough.jtandroid.ioc.exception.DontFindInterfaceImplException;
 import com.jeramtough.jtandroid.ioc.util.JtBeanUtil;
 
@@ -45,22 +46,43 @@ public class DefaultInterfaceImplFinder implements InterfaceImplFinder {
             }
         }
 
+        //有可能是默认实现类
+
+        //有可能是第三方jar注入进来的bean
+        Object beanInstance = JtBeanContainer.getInstance().getBean(interfaceClass);
+        if (beanInstance != null) {
+            return beanInstance.getClass();
+        }
+
         throw new DontFindInterfaceImplException(
                 String.format("The instance of interface[%s] don't have " +
-                                "@InjectComponent or @InjectService in [%s]",
+                                "@InjectComponent or @InjectService in [%s] or register by " +
+                                "BeanContainer.register(Object , JtBeanPatten) method",
                         interfaceClass.getName(), mainClass.getName()));
     }
 
 
     @Override
-    public Class find(@NonNull InjectComponent injectComponent) {
+    public Class find(InjectComponent injectComponent) {
+
         Objects.requireNonNull(injectComponent);
-        Class beanImplClass = injectComponent.impl();
+
+        Class beanImplClass = null;
+        beanImplClass = injectComponent.impl();
         if (beanImplClass == Object.class) {
-            String errorMessage = String.format("Don't find implement of interface[%] " +
-                            "or the impl param of @InjectComponent is Object.class in [%s]",
-                    interfaceClass.getName(), mainClass.getName());
-            throw new DontFindInterfaceImplException(errorMessage);
+
+            try {
+                beanImplClass = Class.forName(
+                        JtBeanUtil.getDefaultComponentClassName(interfaceClass));
+                return beanImplClass;
+            }
+            catch (ClassNotFoundException e) {
+                String errorMessage = String.format("Don't find implement of interface[%] " +
+                                "or the impl param of @InjectComponent is Object.class in [%s]",
+                        interfaceClass.getName(), mainClass.getName());
+                throw new DontFindInterfaceImplException(errorMessage);
+            }
+
         }
         return beanImplClass;
     }
@@ -74,13 +96,19 @@ public class DefaultInterfaceImplFinder implements InterfaceImplFinder {
                 //先以默认了实现类名去选择实现类
                 beanImplClass = Class.forName(
                         JtBeanUtil.getDefaultImplClassName(interfaceClass));
-                //如果未发现默认实现类，那就遍历该包选择实现类
-                if (beanImplClass == null) {
-                    // TODO: 2018-06-03  这个实现先留着，有空再写吧
-                }
             }
             catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                //去impl包去找实现类
+                try {
+                    beanImplClass =
+                            Class.forName(JtBeanUtil.getDefaultImplClassName1(interfaceClass));
+                }
+                catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                    //如果未发现默认实现类，那就遍历该包选择实现类
+                    // TODO: 2018-06-03  这个实现先留着，有空再写吧
+                }
+
             }
         }
         return beanImplClass;

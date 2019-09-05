@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.jeramtough.jtandroid.function.JtExecutors;
 import com.jeramtough.jtandroid.ioc.annotation.JtController;
-import com.jeramtough.jtandroid.ioc.container.BeansContainer;
-import com.jeramtough.jtandroid.ioc.container.JtBeansContainer;
+import com.jeramtough.jtandroid.ioc.container.BeanContainer;
+import com.jeramtough.jtandroid.ioc.container.JtBeanContainer;
 import com.jeramtough.jtandroid.ioc.field.DefaultJtFieldFinder;
 import com.jeramtough.jtandroid.ioc.field.JtField;
 import com.jeramtough.jtandroid.ioc.log.IocLog;
@@ -35,7 +35,7 @@ public class IocContextImpl implements IocContext {
     }
 
     private void initJtBeansContainer() {
-        JtBeansContainer.init(context.getApplicationContext());
+        JtBeanContainer.init(context.getApplicationContext());
     }
 
     @Override
@@ -45,11 +45,11 @@ public class IocContextImpl implements IocContext {
         //find JtFields from JtController
         List<JtField> jtFields = findJtFieldsFromJtController(jtControllerObject);
 
-        //Have gotten all JtField, than register its class to the BeansContainer..
+        //Have gotten all JtField, than register its class to the BeanContainer..
         Map<JtField, Future<Class>> jtFieldFutureMap = new HashMap<>();
         for (final JtField jtField : jtFields) {
             jtFieldFutureMap.put(jtField,
-                    getBeansContainer().registerBeanAsync(jtField.getImplClass()));
+                    getBeanContainer().registerBeanAsync(jtField.getImplClass()));
         }
         //---------------Waiting for instancing all field finished.
 
@@ -57,10 +57,11 @@ public class IocContextImpl implements IocContext {
         for (Map.Entry<JtField, Future<Class>> jtFieldFutureEntry : jtFieldFutureMap.entrySet()) {
             try {
                 Class beanClass = jtFieldFutureEntry.getValue().get();
-                Object beanObject = getBeansContainer().getBean(beanClass);
+                Object beanObject = getBeanContainer().getBean(beanClass);
                 Field field = jtFieldFutureEntry.getKey().getField();
                 field.setAccessible(true);
                 field.set(jtControllerObject, beanObject);
+
             }
             catch (InterruptedException | ExecutionException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -77,8 +78,8 @@ public class IocContextImpl implements IocContext {
     }
 
     @Override
-    public BeansContainer getBeansContainer() {
-        return JtBeansContainer.getInstance();
+    public BeanContainer getBeanContainer() {
+        return JtBeanContainer.getInstance();
     }
 
 

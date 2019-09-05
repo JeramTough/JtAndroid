@@ -10,6 +10,7 @@ import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThread;
 import com.jeramtough.jtandroid.ioc.thread.RegisterBeanThreadPool;
 import com.jeramtough.jtandroid.ioc.util.JtBeanUtil;
 
+import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.concurrent.Future;
 
@@ -17,11 +18,11 @@ import java.util.concurrent.Future;
  * Created on 2019-08-30 17:42
  * by @author JeramTough
  */
-public class RegisterBeansContainer extends BaseBeansContainer
-        implements BeansContainer {
+public class RegisterBeanContainer extends BaseBeanContainer
+        implements BeanContainer {
 
 
-    RegisterBeansContainer(Context applicationContext) {
+    RegisterBeanContainer(Context applicationContext) {
         super(applicationContext);
     }
 
@@ -31,10 +32,19 @@ public class RegisterBeansContainer extends BaseBeansContainer
         Objects.requireNonNull(bean);
         switch (jtBeanPattern) {
             case Singleton:
+                //如果注入bean是接口的话，要迭代它的实现类以及接口
                 putSingletonBean(bean.getClass(), bean);
+                for (Type type : bean.getClass().getGenericInterfaces()) {
+                    Class beanClass = (Class) type;
+                    putSingletonBean(beanClass, bean);
+                }
                 break;
             case Prototype:
                 putPrototypeBean(bean.getClass(), bean);
+                for (Type type : bean.getClass().getGenericInterfaces()) {
+                    Class beanClass = (Class) type;
+                    putPrototypeBean(beanClass, bean);
+                }
                 break;
             case Context:
                 throw new RegisterBeanException("The bean patten can't be the Context");
@@ -42,26 +52,35 @@ public class RegisterBeansContainer extends BaseBeansContainer
         }
     }
 
-
     @Override
     public void registerBean(Class beanClass) {
 
-        switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
-            case Singleton:
-                if (!isContainedSingletonBean(beanClass)) {
+        if (JtBeanUtil.isJtBean(beanClass)) {
+            switch (JtBeanUtil.getJtBeanPattern(beanClass)) {
+                case Singleton:
+                    if (!isContainedSingletonBean(beanClass)) {
+                        JtBeanUtil.checkBeanClass(beanClass);
+                        Object beanInstance = new BeanInterpreterForClass(
+                                beanClass).getBeanInstance();
+                        putSingletonBean(beanClass, beanInstance);
+                    }
+                    break;
+                case Prototype:
                     JtBeanUtil.checkBeanClass(beanClass);
                     Object beanInstance = new BeanInterpreterForClass(
                             beanClass).getBeanInstance();
-                    putSingletonBean(beanClass, beanInstance);
-                }
-                break;
-            case Prototype:
-                JtBeanUtil.checkBeanClass(beanClass);
-                Object beanInstance = new BeanInterpreterForClass(
-                        beanClass).getBeanInstance();
-                putPrototypeBean(beanClass, beanInstance);
-            case Context:
-            default:
+                    putPrototypeBean(beanClass, beanInstance);
+                case Context:
+                default:
+            }
+        }
+        else {
+            if (getBean(beanClass) == null) {
+                throw new RegisterBeanException(
+                        "The bean[" + beanClass.getName() + "] has been not " +
+                                "registered by { \nBeanContainer.register(Object , " +
+                                "JtBeanPatten) method\n}");
+            }
         }
 
     }

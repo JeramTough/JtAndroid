@@ -9,26 +9,26 @@ import com.jeramtough.jtandroid.ioc.exception.DontInitException;
  *
  * @author 11718
  */
-public class JtBeansContainer extends RegisterBeansContainer implements BeansContainer {
+public class JtBeanContainer extends RegisterBeanContainer implements BeanContainer {
 
-    private volatile static JtBeansContainer jtBeansContainer;
+    private volatile static JtBeanContainer jtBeansContainer;
 
 
-    private JtBeansContainer(Context applicationContext) {
+    private JtBeanContainer(Context applicationContext) {
         super(applicationContext);
     }
 
     public static void init(Context applicationContext) {
         if (jtBeansContainer == null) {
-            synchronized (JtBeansContainer.class) {
+            synchronized (JtBeanContainer.class) {
                 if (jtBeansContainer == null) {
-                    jtBeansContainer = new JtBeansContainer(applicationContext);
+                    jtBeansContainer = new JtBeanContainer(applicationContext);
                 }
             }
         }
     }
 
-    public static JtBeansContainer getInstance() {
+    public static JtBeanContainer getInstance() {
         if (jtBeansContainer == null) {
             throw new DontInitException();
         }

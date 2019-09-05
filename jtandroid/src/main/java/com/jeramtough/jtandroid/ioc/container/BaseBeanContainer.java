@@ -15,13 +15,13 @@ import java.util.Objects;
  * Created on 2019-08-30 17:44
  * by @author JeramTough
  */
-abstract class BaseBeansContainer implements BeansContainer {
+abstract class BaseBeanContainer implements BeanContainer {
 
     private Map<String, Object> singletonBeansMap;
     private Map<String, LinkedList<Object>> prototypeBeansMap;
     Context applicationContext;
 
-    BaseBeansContainer(Context applicationContext) {
+    BaseBeanContainer(Context applicationContext) {
         this.applicationContext = applicationContext;
         singletonBeansMap = new HashMap<>(32);
         prototypeBeansMap = new HashMap<>(16);
@@ -38,7 +38,9 @@ abstract class BaseBeansContainer implements BeansContainer {
                 case Singleton:
                     return (T) getSingletonBean(beanClass);
                 case Prototype:
+//                    synchronized (String.class){
                     return (T) getPrototypeBean(beanClass);
+//                    }
                 default:
 
             }
@@ -55,23 +57,23 @@ abstract class BaseBeansContainer implements BeansContainer {
     }
 
     @Override
-    public boolean isContainedBean(Class c) {
+    public boolean isContainedBean(Class beanClass) {
         boolean isContained;
-        isContained = isContainedSingletonBean(c);
+        isContained = isContainedSingletonBean(beanClass);
         if (!isContained) {
-            isContained = isContainedPrototypeBean(c);
+            isContained = isContainedPrototypeBean(beanClass);
         }
         return isContained;
     }
 
     @Override
-    public boolean isContainedSingletonBean(Class c) {
-        return singletonBeansMap.containsKey(JtBeanUtil.processKeyName(c));
+    public boolean isContainedSingletonBean(Class beanClass) {
+        return singletonBeansMap.containsKey(JtBeanUtil.processKeyName(beanClass));
     }
 
     @Override
-    public boolean isContainedPrototypeBean(Class c) {
-        return prototypeBeansMap.containsKey(JtBeanUtil.processKeyName(c));
+    public boolean isContainedPrototypeBean(Class beanClass) {
+        return prototypeBeansMap.containsKey(JtBeanUtil.processKeyName(beanClass));
     }
 
     @Override
@@ -94,12 +96,14 @@ abstract class BaseBeansContainer implements BeansContainer {
     void putPrototypeBean(Class beanClass, Object beanInstance) {
         LinkedList<Object> beanList;
         String beanName = JtBeanUtil.processKeyName(beanClass);
-        beanList = prototypeBeansMap.get(beanName);
-        if (beanList == null) {
-            beanList = new LinkedList<>();
+        synchronized (this) {
+            beanList = prototypeBeansMap.get(beanName);
+            if (beanList == null) {
+                beanList = new LinkedList<>();
+            }
+            beanList.add(beanInstance);
+            prototypeBeansMap.put(beanName, beanList);
         }
-        beanList.add(beanInstance);
-        prototypeBeansMap.put(beanName, beanList);
     }
 
     Object getSingletonBean(Class beanClass) {
@@ -108,16 +112,19 @@ abstract class BaseBeansContainer implements BeansContainer {
 
     Object getPrototypeBean(Class beanClass) {
         String beanName = JtBeanUtil.processKeyName(beanClass);
-        LinkedList<Object> beanList =
-                prototypeBeansMap.get(beanName);
-        if (beanList != null) {
-            Object bean = beanList.removeFirst();
-            if (beanList.size() == 0) {
-                prototypeBeansMap.remove(beanName);
+
+        synchronized (this) {
+            LinkedList<Object> beanList =
+                    prototypeBeansMap.get(beanName);
+            if (beanList != null) {
+                Object bean = beanList.removeFirst();
+                if (beanList.size() == 0) {
+                    prototypeBeansMap.remove(beanName);
+                }
+                return bean;
             }
-            return bean;
+            return null;
         }
-        return null;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.jeramtough.jtandroid.ioc.context;
 
-import com.jeramtough.jtandroid.ioc.container.BeansContainer;
+import com.jeramtough.jtandroid.ioc.container.BeanContainer;
 
 /**
  * IocContext实例为每个JtController都会持有一个；
@@ -20,5 +20,5 @@ public interface IocContext {
     /**
      * 返回Bean容器
      */
-    BeansContainer getBeansContainer();
+    BeanContainer getBeanContainer();
 }
